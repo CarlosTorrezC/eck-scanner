@@ -1,6 +1,8 @@
 package com.eckscanner.ui.home
 
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -81,6 +83,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateWarehouseButton()
+        updateOnlineStatus()
 
         // If app was in background for more than 5 minutes, sync on return
         val now = System.currentTimeMillis()
@@ -97,6 +100,11 @@ class HomeActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         lastResumeTime = System.currentTimeMillis()
+        autoSyncHandler.removeCallbacks(autoSyncRunnable)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
         autoSyncHandler.removeCallbacks(autoSyncRunnable)
     }
 
@@ -138,6 +146,20 @@ class HomeActivity : AppCompatActivity() {
             if (result.error == null) {
                 updateSyncStatus()
             }
+        }
+    }
+
+    private fun updateOnlineStatus() {
+        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = cm.activeNetwork
+        val caps = if (network != null) cm.getNetworkCapabilities(network) else null
+        val isOnline = caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        binding.txtSyncStatus.setTextColor(
+            if (isOnline) android.graphics.Color.parseColor("#90FFFFFF")
+            else android.graphics.Color.parseColor("#FF5252")
+        )
+        if (!isOnline) {
+            binding.txtSyncStatus.text = "OFFLINE"
         }
     }
 

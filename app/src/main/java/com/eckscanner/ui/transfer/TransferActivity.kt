@@ -17,6 +17,7 @@ import com.eckscanner.data.remote.TransferItemRequest
 import com.eckscanner.data.repository.ProductRepository
 import com.eckscanner.databinding.ActivityTransferBinding
 import com.eckscanner.scanner.DataWedgeReceiver
+import com.eckscanner.scanner.ScanFeedback
 import kotlinx.coroutines.launch
 
 class TransferActivity : AppCompatActivity() {
@@ -72,7 +73,7 @@ class TransferActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(scanReceiver)
+        try { unregisterReceiver(scanReceiver) } catch (_: Exception) {}
     }
 
     private fun loadWarehouses() {
@@ -146,9 +147,11 @@ class TransferActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val result = repository.findByCode(code)
             if (result == null) {
+                ScanFeedback.error(this@TransferActivity)
                 Toast.makeText(this@TransferActivity, "No encontrado: $code", Toast.LENGTH_SHORT).show()
                 return@launch
             }
+            ScanFeedback.success(this@TransferActivity)
 
             val productId = result.product.id
             val variantId = result.matchedVariant?.id

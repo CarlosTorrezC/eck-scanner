@@ -14,6 +14,7 @@ import com.eckscanner.data.remote.StockAdjustmentRequest
 import com.eckscanner.data.repository.ProductRepository
 import com.eckscanner.databinding.ActivityCountBinding
 import com.eckscanner.scanner.DataWedgeReceiver
+import com.eckscanner.scanner.ScanFeedback
 import kotlinx.coroutines.launch
 
 class CountActivity : AppCompatActivity() {
@@ -78,16 +79,29 @@ class CountActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(scanReceiver)
+        try { unregisterReceiver(scanReceiver) } catch (_: Exception) {}
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        if (countItems.isNotEmpty()) {
+            AlertDialog.Builder(this)
+                .setMessage("Tienes ${countItems.size} items escaneados. Salir sin enviar?")
+                .setPositiveButton("Salir") { _, _ -> super.onBackPressed() }
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show()
+        } else super.onBackPressed()
     }
 
     private fun onScan(code: String) {
         lifecycleScope.launch {
             val result = repository.findByCode(code)
             if (result == null) {
+                ScanFeedback.error(this@CountActivity)
                 Toast.makeText(this@CountActivity, "No encontrado: $code", Toast.LENGTH_SHORT).show()
                 return@launch
             }
+            ScanFeedback.success(this@CountActivity)
 
             val productId = result.product.id
             val variantId = result.matchedVariant?.id ?: 0

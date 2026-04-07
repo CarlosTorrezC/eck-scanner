@@ -9,7 +9,10 @@ data class WarehouseEntity(
     val code: String?
 )
 
-@Entity(tableName = "products")
+@Entity(
+    tableName = "products",
+    indices = [Index("code"), Index("barcode")]
+)
 data class ProductEntity(
     @PrimaryKey val id: Int,
     val code: String,

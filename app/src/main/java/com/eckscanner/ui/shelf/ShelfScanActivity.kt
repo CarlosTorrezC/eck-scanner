@@ -14,6 +14,7 @@ import com.eckscanner.data.remote.ShelfScanRequest
 import com.eckscanner.data.repository.ProductRepository
 import com.eckscanner.databinding.ActivityShelfScanBinding
 import com.eckscanner.scanner.DataWedgeReceiver
+import com.eckscanner.scanner.ScanFeedback
 import kotlinx.coroutines.launch
 
 class ShelfScanActivity : AppCompatActivity() {
@@ -72,7 +73,18 @@ class ShelfScanActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(scanReceiver)
+        try { unregisterReceiver(scanReceiver) } catch (_: Exception) {}
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        if (items.isNotEmpty()) {
+            AlertDialog.Builder(this)
+                .setMessage("Tienes cambios sin guardar. Salir?")
+                .setPositiveButton("Salir") { _, _ -> super.onBackPressed() }
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show()
+        } else super.onBackPressed()
     }
 
     private fun loadShelf() {
@@ -166,9 +178,11 @@ class ShelfScanActivity : AppCompatActivity() {
         // Check duplicate
         val exists = items.any { it.productId == productId && it.variantId == variantId }
         if (exists) {
+            ScanFeedback.duplicate(this)
             Toast.makeText(this, "Ya esta en la lista", Toast.LENGTH_SHORT).show()
             return
         }
+        ScanFeedback.success(this)
 
         val item = ShelfProductItem(
             productId = productId,

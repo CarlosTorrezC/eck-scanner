@@ -16,6 +16,7 @@ import com.eckscanner.data.remote.TransferDetailDto
 import com.eckscanner.data.remote.TransferDto
 import com.eckscanner.databinding.ActivityReceiveTransferBinding
 import com.eckscanner.scanner.DataWedgeReceiver
+import com.eckscanner.scanner.ScanFeedback
 import kotlinx.coroutines.launch
 
 class ReceiveTransferActivity : AppCompatActivity() {
@@ -56,7 +57,7 @@ class ReceiveTransferActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(scanReceiver)
+        try { unregisterReceiver(scanReceiver) } catch (_: Exception) {}
     }
 
     private fun loadTransfer(id: Int) {
@@ -105,10 +106,12 @@ class ReceiveTransferActivity : AppCompatActivity() {
         // Find matching item by code or SKU
         val item = receiveItems.find { it.variantSku == code || it.productCode == code }
         if (item != null) {
+            ScanFeedback.success(this)
             item.receivedQty += 1.0
             val index = receiveItems.indexOf(item)
             adapter.notifyItemChanged(index)
         } else {
+            ScanFeedback.error(this)
             Toast.makeText(this, "No corresponde a esta transferencia: $code", Toast.LENGTH_SHORT).show()
         }
     }
