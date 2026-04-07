@@ -102,7 +102,7 @@ class CountActivity : AppCompatActivity() {
                 return@launch
             }
             val productId = result.product.id
-            val variantId = result.matchedVariant?.id ?: 0
+            val variantId = result.matchedVariant?.id
 
             // Find existing item in list
             val existing = countItems.find { it.productId == productId && it.variantId == variantId }
@@ -114,12 +114,12 @@ class CountActivity : AppCompatActivity() {
             } else {
                 ScanFeedback.success(this@CountActivity)
                 // Get system stock for this warehouse
-                val stock = repository.getStockInWarehouse(productId, variantId, warehouseId)
+                val stock = repository.getStockInWarehouse(productId, variantId ?: 0, warehouseId)
                 val systemQty = stock?.quantity ?: 0.0
 
                 val item = CountItem(
                     productId = productId,
-                    variantId = if (variantId == 0) null else variantId,
+                    variantId = variantId,
                     productName = result.product.name,
                     variantName = result.matchedVariant?.name,
                     code = result.matchedVariant?.sku ?: result.product.code,

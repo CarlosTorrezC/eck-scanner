@@ -48,7 +48,9 @@ class SyncManager(private val context: Context) {
     }
 
     private suspend fun syncProducts(): Int {
-        val lastSync = ApiClient.getLastProductSync(context)
+        // If DB is empty, do full sync (ignore updated_since)
+        val productCount = db.productDao().getLastUpdatedAt()
+        val lastSync = if (productCount == null) null else ApiClient.getLastProductSync(context)
         var page = 1
         var totalUpdated = 0
 
