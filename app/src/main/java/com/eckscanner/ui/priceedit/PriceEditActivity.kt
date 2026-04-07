@@ -166,18 +166,11 @@ class PriceEditActivity : AppCompatActivity() {
                     ScanFeedback.success(this@PriceEditActivity)
                     val body = response.body()
 
-                    // Update local DB immediately
+                    // Update local DB immediately (always parent product)
                     val db = AppDatabase.getInstance(this@PriceEditActivity)
-                    if (currentVariantId != null) {
-                        val variant = db.variantDao().findBySku(binding.txtCode.text.toString())
-                        if (variant != null) {
-                            db.variantDao().upsertAll(listOf(variant.copy(price = newPrice)))
-                        }
-                    } else {
-                        val product = db.productDao().getById(currentProductId)
-                        if (product != null) {
-                            db.productDao().upsertAll(listOf(product.product.copy(salePrice = newPrice)))
-                        }
+                    val product = db.productDao().getById(currentProductId)
+                    if (product != null) {
+                        db.productDao().upsertAll(listOf(product.product.copy(salePrice = newPrice)))
                     }
 
                     binding.txtCurrentPrice.text = "$ ${String.format("%.2f", newPrice)}"
