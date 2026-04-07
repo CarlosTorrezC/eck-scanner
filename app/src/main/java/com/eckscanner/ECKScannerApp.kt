@@ -13,6 +13,12 @@ class ECKScannerApp : Application() {
         super.onCreate()
         instance = this
         database = AppDatabase.getInstance(this)
+
+        // Initialize ApiClient from saved config so it's always ready
+        val config = ApiClient.getConfig(this)
+        if (config != null && !ApiClient.isInitialized()) {
+            ApiClient.initialize(config.first, config.second)
+        }
     }
 
     companion object {
