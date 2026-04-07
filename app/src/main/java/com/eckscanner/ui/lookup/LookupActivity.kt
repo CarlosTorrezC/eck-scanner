@@ -5,7 +5,6 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -36,14 +35,6 @@ class LookupActivity : AppCompatActivity() {
 
         repository = ProductRepository(this)
         binding.toolbar.setNavigationOnClickListener { finish() }
-
-        binding.editSearch.setOnEditorActionListener { v, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val query = v.text.toString().trim()
-                if (query.isNotEmpty()) lookup(query)
-                true
-            } else false
-        }
 
         scanReceiver = DataWedgeReceiver { code ->
             runOnUiThread { lookup(code) }

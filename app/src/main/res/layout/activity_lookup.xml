@@ -16,24 +16,6 @@
         app:navigationIcon="@drawable/ic_back"
         app:navigationIconTint="@android:color/white" />
 
-    <!-- Search bar -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="6dp"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editSearch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/search_hint"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:textSize="15sp" />
-    </com.google.android.material.textfield.TextInputLayout>
-
     <!-- Scan prompt -->
     <TextView
         android:id="@+id/txtScanPrompt"
