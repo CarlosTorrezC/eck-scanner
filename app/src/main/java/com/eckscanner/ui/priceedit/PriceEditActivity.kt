@@ -151,15 +151,11 @@ class PriceEditActivity : AppCompatActivity() {
             try {
                 val request = PriceUpdateRequest(
                     productId = currentProductId,
-                    variantId = currentVariantId,
+                    variantId = null,
                     salePrice = newPrice
                 )
 
                 val response = ApiClient.getService().updatePrice(request)
-                val code = response.code()
-                val rawBody = if (response.isSuccessful) response.body().toString() else response.errorBody()?.string()
-                Toast.makeText(this@PriceEditActivity, "HTTP $code: $rawBody", Toast.LENGTH_LONG).show()
-
                 if (response.isSuccessful) {
                     ScanFeedback.success(this@PriceEditActivity)
                     val body = response.body()
