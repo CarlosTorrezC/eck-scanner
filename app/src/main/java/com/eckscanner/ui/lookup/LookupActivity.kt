@@ -179,20 +179,20 @@ class LookupActivity : AppCompatActivity() {
             val variantStocks = stockByVariant[variant.id] ?: emptyList()
             val totalQty = variantStocks.sumOf { it.available }
 
-            // Variant header
+            // Variant header - compact
             val header = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
-                setPadding(0, dpToPx(8), 0, dpToPx(2))
+                setPadding(0, dpToPx(4), 0, dpToPx(1))
             }
             header.addView(TextView(this).apply {
                 text = variant.name
-                textSize = 14f
+                textSize = 13f
                 setTypeface(null, Typeface.BOLD)
                 setTextColor(if (isScanned) Color.parseColor("#BF360C") else Color.parseColor("#333333"))
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
             })
             header.addView(TextView(this).apply {
-                text = "Total: ${totalQty.toInt()}"
+                text = "${totalQty.toInt()}"
                 textSize = 13f
                 setTypeface(null, Typeface.BOLD)
                 gravity = Gravity.END
@@ -210,18 +210,18 @@ class LookupActivity : AppCompatActivity() {
 
                     val row = LinearLayout(this).apply {
                         orientation = LinearLayout.HORIZONTAL
-                        setPadding(dpToPx(16), dpToPx(1), 0, dpToPx(1))
+                        setPadding(dpToPx(12), 0, 0, 0)
                         if (isCurrent) setBackgroundColor(Color.parseColor("#E8F5E9"))
                     }
                     row.addView(TextView(this).apply {
                         text = if (isCurrent) "$warehouseName *" else warehouseName
-                        textSize = 12f
+                        textSize = 11f
                         setTextColor(Color.parseColor("#666666"))
                         layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                     })
                     row.addView(TextView(this).apply {
                         text = "${avail.toInt()}"
-                        textSize = 14f
+                        textSize = 12f
                         setTypeface(null, Typeface.BOLD)
                         gravity = Gravity.END
                         setTextColor(if (avail > 0) Color.parseColor("#2E7D32") else Color.parseColor("#999999"))
@@ -238,29 +238,28 @@ class LookupActivity : AppCompatActivity() {
             }
         }
 
-        // Separator
+        // Separator + Total
         binding.layoutStock.addView(View(this).apply {
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dpToPx(1)).apply {
-                topMargin = dpToPx(8)
-                bottomMargin = dpToPx(4)
+                topMargin = dpToPx(4)
+                bottomMargin = dpToPx(2)
             }
             setBackgroundColor(Color.parseColor("#E0E0E0"))
         })
 
-        // Total row
         val totalAll = result.stock.sumOf { it.available }
         val totalRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
         }
         totalRow.addView(TextView(this).apply {
             text = "TOTAL"
-            textSize = 14f
+            textSize = 13f
             setTypeface(null, Typeface.BOLD)
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
         })
         totalRow.addView(TextView(this).apply {
             text = "${totalAll.toInt()}"
-            textSize = 17f
+            textSize = 15f
             setTypeface(null, Typeface.BOLD)
             gravity = Gravity.END
             setTextColor(if (totalAll > 0) Color.parseColor("#2E7D32") else Color.parseColor("#C62828"))
