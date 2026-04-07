@@ -2,7 +2,8 @@ package com.eckscanner.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +28,19 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var syncManager: SyncManager
+
+    private val autoSyncHandler = Handler(Looper.getMainLooper())
+    private var lastResumeTime = 0L
+    private var isSyncing = false
+
+    private val autoSyncRunnable = object : Runnable {
+        override fun run() {
+            if (!isSyncing) {
+                performSilentSync()
+            }
+            autoSyncHandler.postDelayed(this, AUTO_SYNC_INTERVAL)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,14 +81,37 @@ class HomeActivity : AppCompatActivity() {
 
         updateSyncStatus()
         updateWarehouseButton()
+
+        // Auto-sync on first open
+        performSilentSync()
     }
 
     override fun onResume() {
         super.onResume()
         updateWarehouseButton()
+
+        // If app was in background for more than 5 minutes, sync on return
+        val now = System.currentTimeMillis()
+        if (lastResumeTime > 0 && (now - lastResumeTime) > BACKGROUND_SYNC_THRESHOLD) {
+            performSilentSync()
+        }
+        lastResumeTime = now
+
+        // Start periodic auto-sync every 10 minutes
+        autoSyncHandler.removeCallbacks(autoSyncRunnable)
+        autoSyncHandler.postDelayed(autoSyncRunnable, AUTO_SYNC_INTERVAL)
     }
 
+    override fun onPause() {
+        super.onPause()
+        lastResumeTime = System.currentTimeMillis()
+        autoSyncHandler.removeCallbacks(autoSyncRunnable)
+    }
+
+    /** Manual sync - shows toast with result */
     private fun performSync() {
+        if (isSyncing) return
+        isSyncing = true
         binding.btnSync.isEnabled = false
         binding.btnSync.text = "..."
 
@@ -82,6 +119,7 @@ class HomeActivity : AppCompatActivity() {
             val result = syncManager.syncAll()
             binding.btnSync.isEnabled = true
             binding.btnSync.text = "SYNC"
+            isSyncing = false
 
             if (result.error != null) {
                 Toast.makeText(this@HomeActivity, "Error: ${result.error}", Toast.LENGTH_LONG).show()
@@ -93,6 +131,20 @@ class HomeActivity : AppCompatActivity() {
                 ).show()
                 updateSyncStatus()
                 updateWarehouseButton()
+            }
+        }
+    }
+
+    /** Silent sync - no toast, just updates status bar */
+    private fun performSilentSync() {
+        if (isSyncing || !ApiClient.isInitialized()) return
+        isSyncing = true
+
+        lifecycleScope.launch {
+            val result = syncManager.syncAll()
+            isSyncing = false
+            if (result.error == null) {
+                updateSyncStatus()
             }
         }
     }
@@ -156,11 +208,17 @@ class HomeActivity : AppCompatActivity() {
             .setTitle(getString(com.eckscanner.R.string.disconnect))
             .setMessage("Se eliminara la configuracion guardada")
             .setPositiveButton(getString(com.eckscanner.R.string.confirm)) { _, _ ->
+                autoSyncHandler.removeCallbacks(autoSyncRunnable)
                 ApiClient.clearConfig(this)
                 startActivity(Intent(this, LoginActivity::class.java))
                 finish()
             }
             .setNegativeButton(getString(com.eckscanner.R.string.cancel), null)
             .show()
+    }
+
+    companion object {
+        private const val AUTO_SYNC_INTERVAL = 10 * 60 * 1000L  // 10 minutos
+        private const val BACKGROUND_SYNC_THRESHOLD = 5 * 60 * 1000L  // 5 minutos
     }
 }
