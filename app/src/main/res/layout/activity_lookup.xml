@@ -141,10 +141,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#E0E0E0"
-                android:layout_marginVertical="12dp" />
+                android:layout_marginVertical="10dp" />
 
-            <!-- Stock section -->
+            <!-- Variants + Stock section -->
             <TextView
+                android:id="@+id/txtStockHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="STOCK POR ALMACEN"

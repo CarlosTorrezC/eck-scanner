@@ -143,7 +143,7 @@ class LookupActivity : AppCompatActivity() {
 
         if (result.matchedVariant != null) {
             binding.txtVariant.visibility = View.VISIBLE
-            binding.txtVariant.text = result.matchedVariant.name
+            binding.txtVariant.text = "Escaneado: ${result.matchedVariant.name}"
         } else if (result.allVariants.isNotEmpty()) {
             binding.txtVariant.visibility = View.VISIBLE
             binding.txtVariant.text = "${result.allVariants.size} variantes"
@@ -159,12 +159,127 @@ class LookupActivity : AppCompatActivity() {
             binding.txtCategoryBrand.visibility = View.GONE
         }
 
-        // Stock by warehouse - using cached warehouse names (no N+1)
+        // Stock section
         binding.layoutStock.removeAllViews()
         val currentWarehouseId = ApiClient.getWarehouseId(this)
+        val hasVariants = result.allVariants.isNotEmpty()
 
-        if (result.stock.isNotEmpty()) {
-            val grouped = result.stock.groupBy { it.warehouseId }
+        if (hasVariants) {
+            // Show stock per VARIANT per WAREHOUSE
+            binding.txtStockHeader.text = "STOCK POR VARIANTE / ALMACEN"
+            showVariantStock(result, currentWarehouseId)
+        } else {
+            // Simple product without variants - show stock per warehouse
+            binding.txtStockHeader.text = "STOCK POR ALMACEN"
+            showSimpleStock(result.stock, currentWarehouseId)
+        }
+
+        // Locations
+        showLocations()
+    }
+
+    private fun showVariantStock(result: LookupResult, currentWarehouseId: Int) {
+        // Group stock by variant
+        val variantMap = result.allVariants.associateBy { it.id }
+        val stockByVariant = result.stock.groupBy { it.variantId }
+
+        for (variant in result.allVariants) {
+            val isScanned = variant.id == result.matchedVariant?.id
+            val variantStocks = stockByVariant[variant.id] ?: emptyList()
+            val totalQty = variantStocks.sumOf { it.available }
+
+            // Variant header
+            val header = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, dpToPx(8), 0, dpToPx(2))
+            }
+            header.addView(TextView(this).apply {
+                text = variant.name
+                textSize = 14f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(if (isScanned) Color.parseColor("#BF360C") else Color.parseColor("#333333"))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            })
+            header.addView(TextView(this).apply {
+                text = "Total: ${totalQty.toInt()}"
+                textSize = 13f
+                setTypeface(null, Typeface.BOLD)
+                gravity = Gravity.END
+                setTextColor(if (totalQty > 0) Color.parseColor("#2E7D32") else Color.parseColor("#C62828"))
+            })
+            binding.layoutStock.addView(header)
+
+            // Stock per warehouse for this variant
+            if (variantStocks.isNotEmpty()) {
+                val byWarehouse = variantStocks.groupBy { it.warehouseId }
+                for ((warehouseId, stocks) in byWarehouse) {
+                    val warehouseName = warehouseCache[warehouseId] ?: "Almacen #$warehouseId"
+                    val avail = stocks.sumOf { it.available }
+                    val isCurrent = warehouseId == currentWarehouseId
+
+                    val row = LinearLayout(this).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                        setPadding(dpToPx(16), dpToPx(1), 0, dpToPx(1))
+                        if (isCurrent) setBackgroundColor(Color.parseColor("#E8F5E9"))
+                    }
+                    row.addView(TextView(this).apply {
+                        text = if (isCurrent) "$warehouseName *" else warehouseName
+                        textSize = 12f
+                        setTextColor(Color.parseColor("#666666"))
+                        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                    })
+                    row.addView(TextView(this).apply {
+                        text = "${avail.toInt()}"
+                        textSize = 14f
+                        setTypeface(null, Typeface.BOLD)
+                        gravity = Gravity.END
+                        setTextColor(if (avail > 0) Color.parseColor("#2E7D32") else Color.parseColor("#999999"))
+                    })
+                    binding.layoutStock.addView(row)
+                }
+            } else {
+                binding.layoutStock.addView(TextView(this).apply {
+                    text = "  Sin stock"
+                    textSize = 12f
+                    setTextColor(Color.parseColor("#999999"))
+                    setPadding(dpToPx(16), 0, 0, 0)
+                })
+            }
+        }
+
+        // Separator
+        binding.layoutStock.addView(View(this).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dpToPx(1)).apply {
+                topMargin = dpToPx(8)
+                bottomMargin = dpToPx(4)
+            }
+            setBackgroundColor(Color.parseColor("#E0E0E0"))
+        })
+
+        // Total row
+        val totalAll = result.stock.sumOf { it.available }
+        val totalRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+        }
+        totalRow.addView(TextView(this).apply {
+            text = "TOTAL"
+            textSize = 14f
+            setTypeface(null, Typeface.BOLD)
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        })
+        totalRow.addView(TextView(this).apply {
+            text = "${totalAll.toInt()}"
+            textSize = 17f
+            setTypeface(null, Typeface.BOLD)
+            gravity = Gravity.END
+            setTextColor(if (totalAll > 0) Color.parseColor("#2E7D32") else Color.parseColor("#C62828"))
+        })
+        binding.layoutStock.addView(totalRow)
+    }
+
+    private fun showSimpleStock(stock: List<com.eckscanner.data.local.StockEntity>, currentWarehouseId: Int) {
+        if (stock.isNotEmpty()) {
+            val grouped = stock.groupBy { it.warehouseId }
             for ((warehouseId, stocks) in grouped) {
                 val warehouseName = warehouseCache[warehouseId] ?: "Almacen #$warehouseId"
                 val totalAvail = stocks.sumOf { it.available }
@@ -176,14 +291,12 @@ class LookupActivity : AppCompatActivity() {
                     setPadding(pad, dpToPx(3), pad, dpToPx(3))
                     if (isCurrent) setBackgroundColor(Color.parseColor("#E8F5E9"))
                 }
-
                 row.addView(TextView(this).apply {
                     text = if (isCurrent) "$warehouseName *" else warehouseName
                     textSize = 14f
                     if (isCurrent) setTypeface(null, Typeface.BOLD)
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                 })
-
                 row.addView(TextView(this).apply {
                     text = "${totalAvail.toInt()}"
                     textSize = 17f
@@ -191,7 +304,6 @@ class LookupActivity : AppCompatActivity() {
                     gravity = Gravity.END
                     setTextColor(if (totalAvail > 0) Color.parseColor("#2E7D32") else Color.parseColor("#C62828"))
                 })
-
                 binding.layoutStock.addView(row)
             }
         } else {
@@ -201,9 +313,6 @@ class LookupActivity : AppCompatActivity() {
                 setTextColor(Color.parseColor("#C62828"))
             })
         }
-
-        // Locations - show from cached response (no extra API call)
-        showLocations()
     }
 
     private fun showLocations() {

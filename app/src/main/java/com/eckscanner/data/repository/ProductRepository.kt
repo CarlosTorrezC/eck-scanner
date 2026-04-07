@@ -21,44 +21,32 @@ class ProductRepository(private val context: Context) {
         val variant = variantDao.findBySku(code)
         if (variant != null) {
             val product = productDao.getById(variant.productId) ?: return null
-            val stock = stockDao.getForProduct(variant.productId, variant.id)
-            return LookupResult(product.product, variant, product.variants, stock)
+            // Always return ALL stock for the parent product
+            val allStock = stockDao.getAllForProduct(product.product.id)
+            return LookupResult(product.product, variant, product.variants, allStock)
         }
 
-        // 2. Try hyphenated format: extract product code + find variant
+        // 2. Try hyphenated format: extract product code
         if (code.contains("-")) {
             val productCode = code.substringBefore("-")
             val pw = productDao.findByCode(productCode)
             if (pw != null) {
-                // Try to match variant by full SKU or suffix
                 val matchedVariant = pw.variants.find { it.sku == code }
                     ?: pw.variants.find { it.sku.endsWith("-" + code.substringAfter("-")) }
-
-                if (matchedVariant != null) {
-                    val stock = stockDao.getForProduct(pw.product.id, matchedVariant.id)
-                    return LookupResult(pw.product, matchedVariant, pw.variants, stock)
-                }
-
-                // Variant code not matched but product found - show all variants with all stock
                 val allStock = stockDao.getAllForProduct(pw.product.id)
-                return LookupResult(pw.product, null, pw.variants, allStock)
+                return LookupResult(pw.product, matchedVariant, pw.variants, allStock)
             }
         }
 
         // 3. Try product code/barcode exact match
         val productWithVariants = productDao.findByCode(code)
         if (productWithVariants != null) {
-            // If product has variants, get ALL stock (all variants combined)
-            val stock = if (productWithVariants.product.hasVariants) {
-                stockDao.getAllForProduct(productWithVariants.product.id)
-            } else {
-                stockDao.getForProduct(productWithVariants.product.id)
-            }
+            val allStock = stockDao.getAllForProduct(productWithVariants.product.id)
             return LookupResult(
                 productWithVariants.product,
                 null,
                 productWithVariants.variants,
-                stock
+                allStock
             )
         }
 
