@@ -1,0 +1,126 @@
+package com.eckscanner.data.repository
+
+import android.content.Context
+import com.eckscanner.data.local.*
+import com.eckscanner.data.remote.ApiClient
+import com.eckscanner.data.remote.ProductDto
+
+class ProductRepository(private val context: Context) {
+
+    private val db = AppDatabase.getInstance(context)
+    private val productDao = db.productDao()
+    private val variantDao = db.variantDao()
+    private val stockDao = db.stockDao()
+    private val warehouseDao = db.warehouseDao()
+    private val api get() = ApiClient.getService()
+
+    // --- Local lookups (instant, offline) ---
+
+    suspend fun findByCode(code: String): LookupResult? {
+        // Try variant SKU first
+        val variant = variantDao.findBySku(code)
+        if (variant != null) {
+            val product = productDao.getById(variant.productId) ?: return null
+            val stock = stockDao.getForProduct(variant.productId, variant.id)
+            return LookupResult(product.product, variant, product.variants, stock)
+        }
+
+        // Try product code/barcode
+        val productWithVariants = productDao.findByCode(code)
+        if (productWithVariants != null) {
+            val stock = stockDao.getForProduct(productWithVariants.product.id)
+            return LookupResult(
+                productWithVariants.product,
+                null,
+                productWithVariants.variants,
+                stock
+            )
+        }
+
+        // Try extracting product code from hyphenated format (e.g., "123456-789")
+        if (code.contains("-")) {
+            val productCode = code.substringBefore("-")
+            val pw = productDao.findByCode(productCode)
+            if (pw != null) {
+                val variantSuffix = code.substringAfter("-")
+                val matchedVariant = pw.variants.find { it.sku == code || it.sku.endsWith(variantSuffix) }
+                val vid = matchedVariant?.id ?: 0
+                val stock = stockDao.getForProduct(pw.product.id, vid)
+                return LookupResult(pw.product, matchedVariant, pw.variants, stock)
+            }
+        }
+
+        return null
+    }
+
+    suspend fun search(query: String): List<ProductWithVariants> {
+        return productDao.search(query)
+    }
+
+    suspend fun getStockForProduct(productId: Int, variantId: Int = 0): List<StockEntity> {
+        return stockDao.getForProduct(productId, variantId)
+    }
+
+    suspend fun getStockInWarehouse(productId: Int, variantId: Int = 0, warehouseId: Int): StockEntity? {
+        return stockDao.getForProductInWarehouse(productId, variantId, warehouseId)
+    }
+
+    // --- Online lookup (fallback when not in cache) ---
+
+    suspend fun lookupOnline(code: String): LookupResult? {
+        return try {
+            val response = api.lookupBarcode(code)
+            if (!response.isSuccessful) return null
+            val body = response.body() ?: return null
+
+            val product = ProductEntity(
+                id = body.product.id,
+                code = body.product.code,
+                name = body.product.name,
+                barcode = body.product.barcode,
+                salePrice = body.product.salePrice,
+                purchasePrice = body.product.purchasePrice,
+                hasVariants = body.product.hasVariants,
+                categoryName = null,
+                brandName = null,
+                image = body.product.image,
+                minStock = 0,
+                updatedAt = null
+            )
+
+            val variant = body.variant?.let {
+                VariantEntity(
+                    id = it.id, productId = body.product.id,
+                    name = it.name, sku = it.sku, price = it.price, active = true
+                )
+            }
+
+            val stock = body.stock.map {
+                StockEntity(
+                    productId = body.product.id,
+                    variantId = variant?.id ?: 0,
+                    warehouseId = it.warehouseId,
+                    quantity = it.quantity,
+                    available = it.available
+                )
+            }
+
+            LookupResult(product, variant, emptyList(), stock)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    // --- Warehouses ---
+
+    suspend fun getWarehouses(): List<WarehouseEntity> = warehouseDao.getAll()
+
+    suspend fun getWarehouse(id: Int): WarehouseEntity? = warehouseDao.getById(id)
+}
+
+data class LookupResult(
+    val product: ProductEntity,
+    val matchedVariant: VariantEntity?,
+    val allVariants: List<VariantEntity>,
+    val stock: List<StockEntity>
+)

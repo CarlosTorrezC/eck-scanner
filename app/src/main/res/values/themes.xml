@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ECKScanner" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">#1A1A2E</item>
+        <item name="colorPrimaryContainer">#16213E</item>
+        <item name="colorOnPrimaryContainer">@android:color/white</item>
+        <item name="colorSecondary">#E94560</item>
+        <item name="colorSecondaryContainer">#E94560</item>
+        <item name="colorOnSecondaryContainer">@android:color/white</item>
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorOnSurface">#1A1A2E</item>
+        <item name="colorSurfaceVariant">#F5F5F5</item>
+        <item name="android:statusBarColor">?colorPrimary</item>
+    </style>
+
+    <style name="Theme.ECKScanner.FullScreen" parent="Theme.ECKScanner">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="BigButton" parent="Widget.Material3.Button">
+        <item name="android:minHeight">80dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+
+    <style name="ScanResultCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+</resources>

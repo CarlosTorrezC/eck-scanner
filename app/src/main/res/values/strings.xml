@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ECK Scanner</string>
+
+    <!-- Login -->
+    <string name="server_url">URL del servidor</string>
+    <string name="server_url_hint">https://tudominio.com</string>
+    <string name="api_token">Token API</string>
+    <string name="api_token_hint">Pegar token generado en el ERP</string>
+    <string name="connect">Conectar</string>
+    <string name="connecting">Conectando...</string>
+    <string name="connection_error">Error de conexion</string>
+    <string name="disconnect">Desconectar</string>
+
+    <!-- Home -->
+    <string name="lookup_title">Consulta</string>
+    <string name="lookup_desc">Escanear producto</string>
+    <string name="count_title">Conteo</string>
+    <string name="count_desc">Inventario fisico</string>
+    <string name="transfer_title">Transferencias</string>
+    <string name="transfer_desc">Enviar/Recibir</string>
+    <string name="sync">Sincronizar</string>
+    <string name="syncing">Sincronizando...</string>
+    <string name="last_sync">Ultima sync: %s</string>
+    <string name="never_synced">Sin sincronizar</string>
+    <string name="sync_result">Productos: %1$d | Stock: %2$d | Almacenes: %3$d</string>
+    <string name="warehouse">Almacen</string>
+    <string name="select_warehouse">Seleccionar almacen</string>
+
+    <!-- Lookup -->
+    <string name="scan_product">Escanea un producto</string>
+    <string name="product_not_found">Producto no encontrado</string>
+    <string name="price">Precio: Bs %s</string>
+    <string name="variant">Variante: %s</string>
+    <string name="stock_in">Stock en %1$s: %2$s</string>
+    <string name="no_stock">Sin stock</string>
+    <string name="search_hint">Buscar por nombre o codigo...</string>
+
+    <!-- Count -->
+    <string name="start_count">Iniciar conteo</string>
+    <string name="scanning_count">Escaneando... (%d items)</string>
+    <string name="count_summary">Resumen del conteo</string>
+    <string name="system_qty">Sistema: %s</string>
+    <string name="scanned_qty">Escaneado: %s</string>
+    <string name="difference">Diferencia: %s</string>
+    <string name="send_adjustment">Enviar ajuste</string>
+    <string name="adjustment_sent">Ajuste enviado correctamente</string>
+    <string name="clear_count">Limpiar conteo</string>
+
+    <!-- Transfer -->
+    <string name="new_transfer">Nueva transferencia</string>
+    <string name="pending_transfers">Pendientes</string>
+    <string name="in_transit">En transito</string>
+    <string name="from_warehouse">Origen</string>
+    <string name="to_warehouse">Destino</string>
+    <string name="create_transfer">Crear transferencia</string>
+    <string name="send_transfer">Enviar</string>
+    <string name="receive_transfer">Recibir</string>
+    <string name="transfer_created">Transferencia creada</string>
+    <string name="items_count">%d items</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancelar</string>
+    <string name="confirm">Confirmar</string>
+    <string name="error">Error</string>
+    <string name="loading">Cargando...</string>
+    <string name="no_internet">Sin conexion a internet</string>
+    <string name="quantity">Cantidad</string>
+</resources>
