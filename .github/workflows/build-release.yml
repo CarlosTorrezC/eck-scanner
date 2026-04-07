@@ -65,4 +65,7 @@ jobs:
           echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -t ed25519 ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-          scp -i ~/.ssh/deploy_key ${{ steps.apk.outputs.path }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
+          SERVER_DIR=$(dirname ${{ secrets.SERVER_PATH }})
+          VERSION=${{ steps.version.outputs.version_name }}
+          scp -i ~/.ssh/deploy_key ${{ steps.apk.outputs.path }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${SERVER_DIR}/ECKScanner-v${VERSION}.apk
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd ${SERVER_DIR} && cp ECKScanner-v${VERSION}.apk ECKScanner.apk"
