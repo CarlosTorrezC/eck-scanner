@@ -54,6 +54,10 @@ interface ApiService {
     @POST("api/v1/transfers/{id}/cancel")
     suspend fun cancelTransfer(@Path("id") id: Int): Response<TransferResponse>
 
+    // Price update
+    @POST("api/v1/price-update")
+    suspend fun updatePrice(@Body body: PriceUpdateRequest): Response<PriceUpdateResponse>
+
     // Shelves
     @GET("api/v1/shelves")
     suspend fun getShelves(

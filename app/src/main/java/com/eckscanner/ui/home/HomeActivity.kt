@@ -17,6 +17,7 @@ import com.eckscanner.sync.SyncManager
 import com.eckscanner.ui.count.CountActivity
 import com.eckscanner.ui.login.LoginActivity
 import com.eckscanner.ui.lookup.LookupActivity
+import com.eckscanner.ui.priceedit.PriceEditActivity
 import com.eckscanner.ui.shelf.ShelfListActivity
 import com.eckscanner.ui.transfer.TransferActivity
 import kotlinx.coroutines.launch
@@ -68,6 +69,9 @@ class HomeActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             startActivity(Intent(this, ShelfListActivity::class.java))
+        }
+        binding.btnPriceEdit.setOnClickListener {
+            startActivity(Intent(this, PriceEditActivity::class.java))
         }
         binding.btnSync.setOnClickListener { performSync() }
         binding.btnWarehouse.setOnClickListener { showWarehouseSelector() }

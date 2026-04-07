@@ -207,6 +207,22 @@ data class AdjustmentResultItem(
     val balance: Double?
 )
 
+// --- Price Update ---
+
+data class PriceUpdateRequest(
+    @SerializedName("product_id") val productId: Int,
+    @SerializedName("variant_id") val variantId: Int? = null,
+    @SerializedName("sale_price") val salePrice: Double
+)
+
+data class PriceUpdateResponse(
+    val message: String,
+    @SerializedName("product_id") val productId: Int?,
+    @SerializedName("variant_id") val variantId: Int?,
+    @SerializedName("old_price") val oldPrice: Double?,
+    @SerializedName("new_price") val newPrice: Double?
+)
+
 // --- Shelves ---
 
 data class ShelvesResponse(
