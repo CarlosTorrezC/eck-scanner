@@ -86,7 +86,7 @@ class PriceEditActivity : AppCompatActivity() {
 
     private fun showProduct(result: LookupResult) {
         binding.txtScanPrompt.visibility = View.GONE
-        binding.scrollContent.visibility = View.VISIBLE
+        binding.layoutContent.visibility = View.VISIBLE
         binding.txtSuccess.visibility = View.GONE
 
         currentProductId = result.product.id

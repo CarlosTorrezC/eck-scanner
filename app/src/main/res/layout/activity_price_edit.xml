@@ -9,7 +9,7 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="40dp"
         android:background="#E65100"
         app:title="EDITAR PRECIO"
         app:titleTextColor="@android:color/white"
@@ -26,111 +26,99 @@
         android:textSize="20sp"
         android:textColor="#999" />
 
-    <!-- Product + price editor -->
-    <ScrollView
-        android:id="@+id/scrollContent"
+    <!-- Product + price editor - NO SCROLL -->
+    <LinearLayout
+        android:id="@+id/layoutContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp"
         android:visibility="gone">
 
+        <!-- Product info: image + name + current price in one row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#FFF3E0"
+            android:padding="8dp">
 
-            <!-- Product info -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/imgProduct"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="centerCrop"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"
+                android:contentDescription="Producto" />
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFF3E0"
-                android:layout_marginBottom="16dp">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/txtProductName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="14dp"
-                    android:orientation="vertical">
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#333"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/txtVariant"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#E65100"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
-                        <ImageView
-                            android:id="@+id/imgProduct"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:scaleType="centerCrop"
-                            android:layout_marginEnd="12dp"
-                            android:visibility="gone"
-                            android:contentDescription="Producto" />
-
-                        <TextView
-                            android:id="@+id/txtProductName"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:textColor="#333" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/txtVariant"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="15sp"
-                        android:textColor="#E65100"
-                        android:textStyle="bold"
-                        android:layout_marginTop="2dp"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:id="@+id/txtCode"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="13sp"
-                        android:textColor="#888"
-                        android:layout_marginTop="2dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:id="@+id/txtCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="#888" />
+            </LinearLayout>
 
             <!-- Current price -->
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="PRECIO ACTUAL"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="#888" />
-
-            <TextView
                 android:id="@+id/txtCurrentPrice"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="36sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
-                android:textColor="#666"
-                android:layout_marginBottom="20dp" />
+                android:textColor="#666" />
+        </LinearLayout>
 
-            <!-- New price input -->
+        <!-- New price input + save button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingVertical="8dp">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="NUEVO PRECIO ($)"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:textColor="#E65100" />
+                android:textColor="#E65100"
+                android:gravity="center" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="20dp"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -140,7 +128,7 @@
                     android:inputType="numberDecimal"
                     android:imeOptions="actionDone"
                     android:singleLine="true"
-                    android:textSize="32sp"
+                    android:textSize="28sp"
                     android:textStyle="bold"
                     android:textColor="#1B5E20"
                     android:gravity="center"
@@ -148,12 +136,13 @@
                     android:selectAllOnFocus="true" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Save button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="GUARDAR PRECIO"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:text="GUARDAR"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:backgroundTint="#E65100"
@@ -165,11 +154,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="15sp"
+                android:textSize="13sp"
                 android:textColor="#2E7D32"
                 android:textStyle="bold"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="6dp"
                 android:visibility="gone" />
         </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 </LinearLayout>
