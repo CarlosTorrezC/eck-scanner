@@ -62,7 +62,6 @@ class ShelfScanActivity : AppCompatActivity() {
             runOnUiThread { onScan(code) }
         }
 
-        // Load existing items from API
         loadShelf()
     }
 
@@ -127,20 +126,20 @@ class ShelfScanActivity : AppCompatActivity() {
     private fun onScan(code: String) {
         lifecycleScope.launch {
             val result = repository.findByCode(code)
+
             if (result == null) {
                 // Fallback online
                 when (val online = repository.lookupOnline(code)) {
                     is ProductRepository.OnlineResult.Found -> {
                         val r = online.result
-                        addProduct(
-                            productId = r.product.id,
-                            variantId = r.matchedVariant?.id,
-                            productName = r.product.name,
-                            productCode = r.product.code,
-                            variantName = r.matchedVariant?.name,
-                            variantSku = r.matchedVariant?.sku,
-                            stock = r.stock.sumOf { it.quantity }
-                        )
+                        if (r.matchedVariant != null) {
+                            addVariant(r.product.id, r.matchedVariant.id, r.product.name, r.product.code, r.matchedVariant.name, r.matchedVariant.sku)
+                        } else if (r.allVariants.isNotEmpty()) {
+                            ScanFeedback.error(this@ShelfScanActivity)
+                            Toast.makeText(this@ShelfScanActivity, "Escanea el codigo de la variante (color)", Toast.LENGTH_LONG).show()
+                        } else {
+                            addVariant(r.product.id, null, r.product.name, r.product.code, null, null)
+                        }
                     }
                     is ProductRepository.OnlineResult.NetworkError -> {
                         ScanFeedback.error(this@ShelfScanActivity)
@@ -154,34 +153,42 @@ class ShelfScanActivity : AppCompatActivity() {
                 return@launch
             }
 
-            val variantId = result.matchedVariant?.id
-            val warehouseId = ApiClient.getWarehouseId(this@ShelfScanActivity)
-            val stock = if (warehouseId != -1) {
-                repository.getStockInWarehouse(result.product.id, variantId ?: 0, warehouseId)?.quantity ?: 0.0
+            // Local result
+            if (result.matchedVariant != null) {
+                // Scanned a specific variant - add it
+                addVariant(
+                    result.product.id,
+                    result.matchedVariant.id,
+                    result.product.name,
+                    result.product.code,
+                    result.matchedVariant.name,
+                    result.matchedVariant.sku
+                )
+            } else if (result.product.hasVariants && result.allVariants.isNotEmpty()) {
+                // Scanned parent product that has variants - ask to scan variant
+                ScanFeedback.error(this@ShelfScanActivity)
+                Toast.makeText(this@ShelfScanActivity, "Este producto tiene variantes. Escanea el codigo de cada color.", Toast.LENGTH_LONG).show()
             } else {
-                result.stock.sumOf { it.quantity }
+                // Product without variants - add directly
+                addVariant(
+                    result.product.id,
+                    null,
+                    result.product.name,
+                    result.product.code,
+                    null,
+                    null
+                )
             }
-
-            addProduct(
-                productId = result.product.id,
-                variantId = variantId,
-                productName = result.product.name,
-                productCode = result.product.code,
-                variantName = result.matchedVariant?.name,
-                variantSku = result.matchedVariant?.sku,
-                stock = stock
-            )
         }
     }
 
-    private fun addProduct(
+    private fun addVariant(
         productId: Int,
         variantId: Int?,
         productName: String,
         productCode: String,
         variantName: String?,
-        variantSku: String?,
-        stock: Double
+        variantSku: String?
     ) {
         // Check duplicate
         val exists = items.any { it.productId == productId && it.variantId == variantId }
@@ -199,7 +206,7 @@ class ShelfScanActivity : AppCompatActivity() {
             productCode = productCode,
             variantName = variantName,
             variantSku = variantSku,
-            warehouseStock = stock,
+            warehouseStock = 0.0,
             otherShelves = emptyList()
         )
 
@@ -207,13 +214,10 @@ class ShelfScanActivity : AppCompatActivity() {
         adapter.notifyItemInserted(0)
         binding.recyclerItems.scrollToPosition(0)
 
-        // Show feedback
+        // Feedback
         binding.cardLastScan.visibility = View.VISIBLE
-        binding.txtLastScanName.text = productName
-        binding.txtLastScanDetail.text = buildString {
-            append(variantSku ?: productCode)
-            variantName?.let { append(" | $it") }
-        }
+        binding.txtLastScanName.text = if (variantName != null) "$productName - $variantName" else productName
+        binding.txtLastScanDetail.text = variantSku ?: productCode
 
         updateCount()
     }
@@ -251,6 +255,7 @@ class ShelfScanActivity : AppCompatActivity() {
 
                 val response = ApiClient.getService().scanShelf(shelfId, request)
                 if (response.isSuccessful) {
+                    ScanFeedback.success(this@ShelfScanActivity)
                     val assigned = response.body()?.assigned ?: items.size
                     Toast.makeText(
                         this@ShelfScanActivity,
@@ -259,10 +264,12 @@ class ShelfScanActivity : AppCompatActivity() {
                     ).show()
                     finish()
                 } else {
-                    Toast.makeText(this@ShelfScanActivity, "Error ${response.code()}", Toast.LENGTH_SHORT).show()
+                    ScanFeedback.error(this@ShelfScanActivity)
+                    Toast.makeText(this@ShelfScanActivity, "Error ${response.code()}: ${response.errorBody()?.string()?.take(100)}", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@ShelfScanActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                ScanFeedback.error(this@ShelfScanActivity)
+                Toast.makeText(this@ShelfScanActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             } finally {
                 binding.btnSave.isEnabled = true
             }

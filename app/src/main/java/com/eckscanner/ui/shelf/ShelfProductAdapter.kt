@@ -1,5 +1,6 @@
 package com.eckscanner.ui.shelf
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,19 +23,24 @@ class ShelfProductAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         val b = holder.binding
-        val ctx = holder.itemView.context
 
-        b.txtName.text = item.productName
-        b.txtDetail.text = buildString {
-            append(item.variantSku ?: item.productCode)
-            item.variantName?.let { append(" | $it") }
+        // Show variant name prominently, product name secondary
+        if (item.variantName != null) {
+            b.txtName.text = "${item.variantName} - ${item.productName}"
+            b.txtName.setTextColor(Color.parseColor("#004D40"))
+        } else {
+            b.txtName.text = item.productName
+            b.txtName.setTextColor(Color.parseColor("#333333"))
         }
 
-        b.txtStock.text = ctx.getString(R.string.stock_qty, item.warehouseStock.toInt().toString())
+        b.txtDetail.text = item.variantSku ?: item.productCode
+
+        // Hide stock for shelves - not relevant
+        b.txtStock.visibility = View.GONE
 
         if (item.otherShelves.isNotEmpty()) {
             b.txtOtherShelves.visibility = View.VISIBLE
-            b.txtOtherShelves.text = ctx.getString(R.string.other_shelves, item.otherShelves.joinToString(", "))
+            b.txtOtherShelves.text = "Tambien en: ${item.otherShelves.joinToString(", ")}"
         } else {
             b.txtOtherShelves.visibility = View.GONE
         }
