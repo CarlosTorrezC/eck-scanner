@@ -66,17 +66,27 @@ class LookupActivity : AppCompatActivity() {
 
     private fun lookup(code: String) {
         lifecycleScope.launch {
-            var result = repository.findByCode(code)
-            if (result == null) {
-                result = repository.lookupOnline(code)
+            val localResult = repository.findByCode(code)
+            if (localResult != null) {
+                ScanFeedback.success(this@LookupActivity)
+                showResult(localResult)
+                return@launch
             }
 
-            if (result != null) {
-                ScanFeedback.success(this@LookupActivity)
-                showResult(result)
-            } else {
-                ScanFeedback.error(this@LookupActivity)
-                showNotFound()
+            // Fallback to online
+            when (val online = repository.lookupOnline(code)) {
+                is ProductRepository.OnlineResult.Found -> {
+                    ScanFeedback.success(this@LookupActivity)
+                    showResult(online.result)
+                }
+                is ProductRepository.OnlineResult.NotFound -> {
+                    ScanFeedback.error(this@LookupActivity)
+                    showNotFound()
+                }
+                is ProductRepository.OnlineResult.NetworkError -> {
+                    ScanFeedback.error(this@LookupActivity)
+                    showError(online.message)
+                }
             }
         }
     }
@@ -86,9 +96,9 @@ class LookupActivity : AppCompatActivity() {
         binding.txtNotFound.visibility = View.GONE
         binding.scrollResult.visibility = View.VISIBLE
 
-        // Price
+        // Price (safe for null variant prices)
         val price = result.matchedVariant?.price ?: result.product.salePrice
-        binding.txtPrice.text = String.format("%.2f", price)
+        binding.txtPrice.text = String.format("%.2f", price ?: 0.0)
 
         // Product info
         binding.txtProductName.text = result.product.name
@@ -199,6 +209,14 @@ class LookupActivity : AppCompatActivity() {
     private fun showNotFound() {
         binding.txtScanPrompt.visibility = View.GONE
         binding.scrollResult.visibility = View.GONE
+        binding.txtNotFound.text = getString(R.string.product_not_found)
+        binding.txtNotFound.visibility = View.VISIBLE
+    }
+
+    private fun showError(message: String) {
+        binding.txtScanPrompt.visibility = View.GONE
+        binding.scrollResult.visibility = View.GONE
+        binding.txtNotFound.text = message
         binding.txtNotFound.visibility = View.VISIBLE
     }
 

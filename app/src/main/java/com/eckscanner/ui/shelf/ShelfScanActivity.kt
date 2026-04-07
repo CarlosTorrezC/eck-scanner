@@ -129,20 +129,28 @@ class ShelfScanActivity : AppCompatActivity() {
             val result = repository.findByCode(code)
             if (result == null) {
                 // Fallback online
-                val online = repository.lookupOnline(code)
-                if (online == null) {
-                    Toast.makeText(this@ShelfScanActivity, "No encontrado: $code", Toast.LENGTH_SHORT).show()
-                    return@launch
+                when (val online = repository.lookupOnline(code)) {
+                    is ProductRepository.OnlineResult.Found -> {
+                        val r = online.result
+                        addProduct(
+                            productId = r.product.id,
+                            variantId = r.matchedVariant?.id,
+                            productName = r.product.name,
+                            productCode = r.product.code,
+                            variantName = r.matchedVariant?.name,
+                            variantSku = r.matchedVariant?.sku,
+                            stock = r.stock.sumOf { it.quantity }
+                        )
+                    }
+                    is ProductRepository.OnlineResult.NetworkError -> {
+                        ScanFeedback.error(this@ShelfScanActivity)
+                        Toast.makeText(this@ShelfScanActivity, online.message, Toast.LENGTH_SHORT).show()
+                    }
+                    is ProductRepository.OnlineResult.NotFound -> {
+                        ScanFeedback.error(this@ShelfScanActivity)
+                        Toast.makeText(this@ShelfScanActivity, "No encontrado: $code", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                addProduct(
-                    productId = online.product.id,
-                    variantId = online.matchedVariant?.id,
-                    productName = online.product.name,
-                    productCode = online.product.code,
-                    variantName = online.matchedVariant?.name,
-                    variantSku = online.matchedVariant?.sku,
-                    stock = online.stock.sumOf { it.quantity }
-                )
                 return@launch
             }
 

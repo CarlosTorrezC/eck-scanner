@@ -67,11 +67,18 @@ class ProductRepository(private val context: Context) {
 
     // --- Online lookup (fallback when not in cache) ---
 
-    suspend fun lookupOnline(code: String): LookupResult? {
+    sealed class OnlineResult {
+        data class Found(val result: LookupResult) : OnlineResult()
+        object NotFound : OnlineResult()
+        data class NetworkError(val message: String) : OnlineResult()
+    }
+
+    suspend fun lookupOnline(code: String): OnlineResult {
         return try {
             val response = api.lookupBarcode(code)
-            if (!response.isSuccessful) return null
-            val body = response.body() ?: return null
+            if (response.code() == 404) return OnlineResult.NotFound
+            if (!response.isSuccessful) return OnlineResult.NetworkError("Error ${response.code()}")
+            val body = response.body() ?: return OnlineResult.NotFound
 
             val product = ProductEntity(
                 id = body.product.id,
@@ -105,9 +112,13 @@ class ProductRepository(private val context: Context) {
                 )
             }
 
-            LookupResult(product, variant, emptyList(), stock)
-        } catch (_: Exception) {
-            null
+            OnlineResult.Found(LookupResult(product, variant, emptyList(), stock))
+        } catch (e: java.net.UnknownHostException) {
+            OnlineResult.NetworkError("Sin conexion a internet")
+        } catch (e: java.net.SocketTimeoutException) {
+            OnlineResult.NetworkError("Tiempo de espera agotado")
+        } catch (e: Exception) {
+            OnlineResult.NetworkError(e.message ?: "Error de red")
         }
     }
 

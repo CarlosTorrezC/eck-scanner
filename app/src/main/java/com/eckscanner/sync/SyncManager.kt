@@ -122,16 +122,17 @@ class SyncManager(private val context: Context) {
             val stockList = body.data
             if (stockList.isEmpty()) break
 
-            val entities = stockList.map { dto ->
+            val entities = stockList.mapNotNull { dto ->
+                val warehouseId = dto.warehouse?.id ?: return@mapNotNull null
                 StockEntity(
                     productId = dto.productId,
                     variantId = dto.variant?.id ?: 0,
-                    warehouseId = dto.warehouse?.id ?: 0,
+                    warehouseId = warehouseId,
                     quantity = dto.quantity,
                     available = dto.available
                 )
             }
-            db.stockDao().upsertAll(entities)
+            if (entities.isNotEmpty()) db.stockDao().upsertAll(entities)
             totalUpdated += entities.size
 
             val meta = body.meta

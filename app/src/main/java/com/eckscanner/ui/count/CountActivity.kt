@@ -101,18 +101,18 @@ class CountActivity : AppCompatActivity() {
                 Toast.makeText(this@CountActivity, "No encontrado: $code", Toast.LENGTH_SHORT).show()
                 return@launch
             }
-            ScanFeedback.success(this@CountActivity)
-
             val productId = result.product.id
             val variantId = result.matchedVariant?.id ?: 0
 
             // Find existing item in list
             val existing = countItems.find { it.productId == productId && it.variantId == variantId }
             if (existing != null) {
+                ScanFeedback.duplicate(this@CountActivity)
                 existing.scannedQty += 1.0
                 val index = countItems.indexOf(existing)
                 adapter.notifyItemChanged(index)
             } else {
+                ScanFeedback.success(this@CountActivity)
                 // Get system stock for this warehouse
                 val stock = repository.getStockInWarehouse(productId, variantId, warehouseId)
                 val systemQty = stock?.quantity ?: 0.0
