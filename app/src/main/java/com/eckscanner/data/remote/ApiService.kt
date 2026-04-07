@@ -53,4 +53,19 @@ interface ApiService {
 
     @POST("api/v1/transfers/{id}/cancel")
     suspend fun cancelTransfer(@Path("id") id: Int): Response<TransferResponse>
+
+    // Shelves
+    @GET("api/v1/shelves")
+    suspend fun getShelves(
+        @Query("warehouse_id") warehouseId: Int? = null
+    ): Response<ShelvesResponse>
+
+    @GET("api/v1/shelves/{id}")
+    suspend fun getShelf(@Path("id") id: Int): Response<ShelfDetailResponse>
+
+    @POST("api/v1/shelves/{id}/scan")
+    suspend fun scanShelf(
+        @Path("id") id: Int,
+        @Body body: ShelfScanRequest
+    ): Response<ShelfScanResponse>
 }

@@ -14,6 +14,7 @@ import com.eckscanner.sync.SyncManager
 import com.eckscanner.ui.count.CountActivity
 import com.eckscanner.ui.login.LoginActivity
 import com.eckscanner.ui.lookup.LookupActivity
+import com.eckscanner.ui.shelf.ShelfListActivity
 import com.eckscanner.ui.transfer.TransferActivity
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -44,6 +45,13 @@ class HomeActivity : AppCompatActivity() {
         }
         binding.btnTransfer.setOnClickListener {
             startActivity(Intent(this, TransferActivity::class.java))
+        }
+        binding.btnShelves.setOnClickListener {
+            if (ApiClient.getWarehouseId(this) == -1) {
+                Toast.makeText(this, "Selecciona un almacen primero", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            startActivity(Intent(this, ShelfListActivity::class.java))
         }
         binding.btnSync.setOnClickListener { performSync() }
         binding.btnWarehouse.setOnClickListener { showWarehouseSelector() }

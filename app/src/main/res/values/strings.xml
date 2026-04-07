@@ -59,6 +59,20 @@
     <string name="transfer_created">Transferencia creada</string>
     <string name="items_count">%d items</string>
 
+    <!-- Shelves -->
+    <string name="shelves_title">Estantes</string>
+    <string name="shelves_desc">Ubicacion de productos</string>
+    <string name="shelf_list">Estantes</string>
+    <string name="shelf_scan">Escanear estante</string>
+    <string name="shelf_scan_info">Escanea los productos en este estante</string>
+    <string name="shelf_saved">Estante guardado (%d productos)</string>
+    <string name="other_shelves">Tambien en: %s</string>
+    <string name="stock_qty">Stock: %s</string>
+    <string name="save_shelf">Guardar estante</string>
+    <string name="last_scanned">Escaneado: %s</string>
+    <string name="never_scanned">Sin escanear</string>
+    <string name="products_on_shelf">%d productos</string>
+
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Cancelar</string>

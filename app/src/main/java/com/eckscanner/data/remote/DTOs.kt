@@ -197,3 +197,56 @@ data class AdjustmentResultItem(
     val quantity: Double,
     val balance: Double?
 )
+
+// --- Shelves ---
+
+data class ShelvesResponse(
+    val data: List<ShelfDto>
+)
+
+data class ShelfDetailResponse(
+    val data: ShelfWithItemsDto
+)
+
+data class ShelfScanResponse(
+    val message: String,
+    val assigned: Int?
+)
+
+data class ShelfDto(
+    val id: Int,
+    val name: String,
+    val code: String?,
+    val warehouse: NamedDto,
+    @SerializedName("products_count") val productsCount: Int,
+    @SerializedName("last_scanned_at") val lastScannedAt: String?
+)
+
+data class ShelfWithItemsDto(
+    val id: Int,
+    val name: String,
+    val code: String?,
+    val warehouse: NamedDto,
+    @SerializedName("last_scanned_at") val lastScannedAt: String?,
+    val items: List<ShelfItemDto>
+)
+
+data class ShelfItemDto(
+    @SerializedName("product_id") val productId: Int,
+    @SerializedName("variant_id") val variantId: Int?,
+    @SerializedName("product_code") val productCode: String,
+    @SerializedName("product_name") val productName: String,
+    @SerializedName("variant_name") val variantName: String?,
+    @SerializedName("variant_sku") val variantSku: String?,
+    @SerializedName("warehouse_stock") val warehouseStock: Double,
+    @SerializedName("other_shelves") val otherShelves: List<String>?
+)
+
+data class ShelfScanRequest(
+    val items: List<ShelfScanItemRequest>
+)
+
+data class ShelfScanItemRequest(
+    @SerializedName("product_id") val productId: Int,
+    @SerializedName("variant_id") val variantId: Int? = null
+)

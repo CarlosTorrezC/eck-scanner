@@ -111,10 +111,23 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_marginBottom="12dp"
             android:text="@string/transfer_title"
             android:textSize="22sp"
             app:backgroundTint="#533483"
             app:icon="@android:drawable/ic_menu_send"
+            app:iconGravity="start"
+            app:iconSize="32dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnShelves"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/shelves_title"
+            android:textSize="22sp"
+            app:backgroundTint="#00695C"
+            app:icon="@android:drawable/ic_menu_sort_by_size"
             app:iconGravity="start"
             app:iconSize="32dp" />
     </LinearLayout>
