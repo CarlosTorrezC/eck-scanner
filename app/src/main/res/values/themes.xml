@@ -9,23 +9,21 @@
         <item name="colorOnSecondaryContainer">@android:color/white</item>
         <item name="colorSurface">@android:color/white</item>
         <item name="colorOnSurface">#1A1A2E</item>
-        <item name="colorSurfaceVariant">#F5F5F5</item>
+        <item name="colorSurfaceVariant">#EEEEEE</item>
         <item name="android:statusBarColor">?colorPrimary</item>
     </style>
 
-    <style name="Theme.ECKScanner.FullScreen" parent="Theme.ECKScanner">
-        <item name="android:windowFullscreen">true</item>
+    <!-- Industrial flat button for home grid -->
+    <style name="GridButton" parent="Widget.Material3.Button">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="cornerRadius">6dp</item>
+        <item name="android:letterSpacing">0.02</item>
     </style>
 
-    <style name="BigButton" parent="Widget.Material3.Button">
-        <item name="android:minHeight">80dp</item>
-        <item name="android:textSize">18sp</item>
-        <item name="cornerRadius">16dp</item>
-    </style>
-
-    <style name="ScanResultCard" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardCornerRadius">12dp</item>
-        <item name="cardElevation">4dp</item>
-        <item name="contentPadding">16dp</item>
+    <!-- Compact toolbar for industrial screens -->
+    <style name="CompactToolbar">
+        <item name="android:minHeight">44dp</item>
     </style>
 </resources>

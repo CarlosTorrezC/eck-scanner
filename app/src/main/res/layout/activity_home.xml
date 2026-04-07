@@ -3,153 +3,156 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#EEEEEE">
 
-    <!-- Toolbar -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
-        android:background="?colorPrimary"
-        app:title="@string/app_name"
-        app:titleTextColor="@android:color/white"
-        app:menu="@menu/menu_home" />
-
-    <!-- Sync status -->
+    <!-- Compact header -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="44dp"
+        android:background="#1A1A2E"
         android:gravity="center_vertical"
-        android:padding="12dp"
-        android:background="?colorSurfaceVariant">
+        android:paddingHorizontal="12dp">
 
         <TextView
-            android:id="@+id/txtSyncStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/never_synced"
-            android:textSize="13sp" />
+            android:text="@string/app_name"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/txtSyncStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="#90FFFFFF"
+            android:layout_marginEnd="8dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSync"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="@string/sync"
-            android:textSize="12sp"
-            style="@style/Widget.Material3.Button.TonalButton" />
+            android:layout_height="32dp"
+            android:text="SYNC"
+            android:textSize="11sp"
+            style="@style/Widget.Material3.Button.TonalButton"
+            app:cornerRadius="4dp" />
     </LinearLayout>
 
-    <!-- Warehouse selector -->
+    <!-- Warehouse selector - compact -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_height="40dp"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/warehouse"
-            android:textSize="14sp"
+            android:text="ALMACEN:"
+            android:textSize="12sp"
             android:textStyle="bold"
-            android:layout_marginEnd="12dp" />
+            android:textColor="#888"
+            android:layout_marginEnd="8dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnWarehouse"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="32dp"
             android:layout_weight="1"
             android:text="@string/select_warehouse"
-            android:textSize="14sp"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
+            android:textSize="13sp"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:cornerRadius="4dp" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#E0E0E0" />
+        android:background="#DDDDDD" />
 
-    <!-- Module buttons - 3x2 grid -->
+    <!-- 3x2 Grid - flat rectangular buttons, edge to edge -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="6dp">
 
-        <!-- Row 1 -->
+        <!-- Row 1: Consulta | Precio -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="4dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLookup"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginEnd="4dp"
-                android:text="@string/lookup_title"
-                android:textSize="16sp"
-                app:icon="@android:drawable/ic_menu_search"
-                app:iconGravity="top"
-                app:iconSize="28dp" />
+                android:layout_marginEnd="2dp"
+                android:text="CONSULTA\nPRODUCTO"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="4dp"
+                app:backgroundTint="#1A1A2E"
+                app:cornerRadius="6dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPriceCheck"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginStart="4dp"
-                android:text="@string/price_checker_title"
-                android:textSize="16sp"
-                app:backgroundTint="#D84315"
-                app:icon="@android:drawable/ic_menu_view"
-                app:iconGravity="top"
-                app:iconSize="28dp" />
+                android:layout_marginStart="2dp"
+                android:text="VERIFICAR\nPRECIO"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="4dp"
+                app:backgroundTint="#BF360C"
+                app:cornerRadius="6dp" />
         </LinearLayout>
 
-        <!-- Row 2 -->
+        <!-- Row 2: Conteo | Transferencias -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="4dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCount"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginEnd="4dp"
-                android:text="@string/count_title"
-                android:textSize="16sp"
-                app:backgroundTint="#0F3460"
-                app:icon="@android:drawable/ic_menu_agenda"
-                app:iconGravity="top"
-                app:iconSize="28dp" />
+                android:layout_marginEnd="2dp"
+                android:text="CONTEO\nINVENTARIO"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="4dp"
+                app:backgroundTint="#0D47A1"
+                app:cornerRadius="6dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnTransfer"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginStart="4dp"
-                android:text="@string/transfer_title"
-                android:textSize="16sp"
-                app:backgroundTint="#533483"
-                app:icon="@android:drawable/ic_menu_send"
-                app:iconGravity="top"
-                app:iconSize="28dp" />
+                android:layout_marginStart="2dp"
+                android:text="TRANS-\nFERENCIAS"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="4dp"
+                app:backgroundTint="#4A148C"
+                app:cornerRadius="6dp" />
         </LinearLayout>
 
-        <!-- Row 3 -->
+        <!-- Row 3: Estantes | Ubicacion -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -161,26 +164,43 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginEnd="4dp"
-                android:text="@string/shelves_title"
-                android:textSize="16sp"
-                app:backgroundTint="#00695C"
-                app:icon="@android:drawable/ic_menu_sort_by_size"
-                app:iconGravity="top"
-                app:iconSize="28dp" />
+                android:layout_marginEnd="2dp"
+                android:text="ESCANEAR\nESTANTES"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="4dp"
+                app:backgroundTint="#004D40"
+                app:cornerRadius="6dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLocation"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginStart="4dp"
-                android:text="@string/location_finder_title"
-                android:textSize="16sp"
+                android:layout_marginStart="2dp"
+                android:text="BUSCAR\nUBICACION"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="4dp"
                 app:backgroundTint="#37474F"
-                app:icon="@android:drawable/ic_menu_myplaces"
-                app:iconGravity="top"
-                app:iconSize="28dp" />
+                app:cornerRadius="6dp" />
         </LinearLayout>
+    </LinearLayout>
+
+    <!-- Disconnect -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="@android:color/white"
+        android:gravity="center">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDisconnect"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="@string/disconnect"
+            android:textSize="11sp"
+            android:textColor="#888"
+            style="@style/Widget.Material3.Button.TextButton" />
     </LinearLayout>
 </LinearLayout>

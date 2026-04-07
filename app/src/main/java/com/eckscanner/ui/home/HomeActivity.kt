@@ -63,13 +63,7 @@ class HomeActivity : AppCompatActivity() {
         }
         binding.btnSync.setOnClickListener { performSync() }
         binding.btnWarehouse.setOnClickListener { showWarehouseSelector() }
-
-        binding.toolbar.setOnMenuItemClickListener { item ->
-            if (item.itemId == com.eckscanner.R.id.action_disconnect) {
-                disconnect()
-                true
-            } else false
-        }
+        binding.btnDisconnect.setOnClickListener { disconnect() }
 
         updateSyncStatus()
         updateWarehouseButton()
@@ -82,12 +76,12 @@ class HomeActivity : AppCompatActivity() {
 
     private fun performSync() {
         binding.btnSync.isEnabled = false
-        binding.btnSync.text = getString(com.eckscanner.R.string.syncing)
+        binding.btnSync.text = "..."
 
         lifecycleScope.launch {
             val result = syncManager.syncAll()
             binding.btnSync.isEnabled = true
-            binding.btnSync.text = getString(com.eckscanner.R.string.sync)
+            binding.btnSync.text = "SYNC"
 
             if (result.error != null) {
                 Toast.makeText(this@HomeActivity, "Error: ${result.error}", Toast.LENGTH_LONG).show()
