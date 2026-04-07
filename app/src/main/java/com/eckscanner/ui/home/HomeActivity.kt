@@ -236,7 +236,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val AUTO_SYNC_INTERVAL = 10 * 60 * 1000L  // 10 minutos
-        private const val BACKGROUND_SYNC_THRESHOLD = 5 * 60 * 1000L  // 5 minutos
+        private const val AUTO_SYNC_INTERVAL = 30 * 60 * 1000L  // 30 minutos
+        private const val BACKGROUND_SYNC_THRESHOLD = 15 * 60 * 1000L  // 15 minutos
     }
 }

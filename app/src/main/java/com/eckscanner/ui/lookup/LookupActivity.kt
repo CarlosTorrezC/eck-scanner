@@ -66,11 +66,16 @@ class LookupActivity : AppCompatActivity() {
         try { unregisterReceiver(scanReceiver) } catch (_: Exception) {}
     }
 
+    private var lastBarcodeResponse: com.eckscanner.data.remote.BarcodeResponse? = null
+
     private fun lookup(code: String) {
+        lastBarcodeResponse = null
         lifecycleScope.launch {
             val localResult = repository.findByCode(code)
             if (localResult != null) {
                 ScanFeedback.success(this@LookupActivity)
+                // Fetch online in background for locations (single call, cached)
+                fetchBarcodeOnline(code)
                 showResult(localResult)
                 return@launch
             }
@@ -93,6 +98,19 @@ class LookupActivity : AppCompatActivity() {
         }
     }
 
+    /** Single API call for locations - reuses response, no duplicate */
+    private fun fetchBarcodeOnline(code: String) {
+        lifecycleScope.launch {
+            try {
+                val response = ApiClient.getService().lookupBarcode(code)
+                if (response.isSuccessful) {
+                    lastBarcodeResponse = response.body()
+                    showLocations()
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
     private fun showResult(result: LookupResult) {
         binding.txtScanPrompt.visibility = View.GONE
         binding.txtNotFound.visibility = View.GONE
@@ -110,8 +128,9 @@ class LookupActivity : AppCompatActivity() {
             val imageUrl = "$baseUrl/storage/$image"
             binding.imgProduct.visibility = View.VISIBLE
             binding.imgProduct.load(imageUrl) {
-                crossfade(true)
-                transformations(RoundedCornersTransformation(16f))
+                crossfade(false)
+                transformations(RoundedCornersTransformation(8f))
+                placeholder(android.R.drawable.ic_menu_gallery)
                 error(android.R.drawable.ic_menu_gallery)
             }
         } else {
@@ -183,44 +202,37 @@ class LookupActivity : AppCompatActivity() {
             })
         }
 
-        // Locations - fetch online (non-blocking, secondary info)
-        fetchLocations(result)
+        // Locations - show from cached response (no extra API call)
+        showLocations()
     }
 
-    private fun fetchLocations(result: LookupResult) {
+    private fun showLocations() {
         binding.layoutLocations.removeAllViews()
         binding.txtLocationHeader.visibility = View.GONE
 
-        lifecycleScope.launch {
-            try {
-                val code = result.matchedVariant?.sku ?: result.product.code
-                val response = ApiClient.getService().lookupBarcode(code)
-                if (!response.isSuccessful) return@launch
-                val locations = response.body()?.locations ?: return@launch
-                if (locations.isEmpty()) return@launch
+        val locations = lastBarcodeResponse?.locations ?: return
+        if (locations.isEmpty()) return
 
-                binding.txtLocationHeader.visibility = View.VISIBLE
-                for (loc in locations) {
-                    val row = LinearLayout(this@LookupActivity).apply {
-                        orientation = LinearLayout.HORIZONTAL
-                        setPadding(0, dpToPx(2), 0, dpToPx(2))
-                    }
-                    row.addView(TextView(this@LookupActivity).apply {
-                        text = loc.shelfName ?: "-"
-                        textSize = 14f
-                        setTypeface(null, Typeface.BOLD)
-                        setTextColor(Color.parseColor("#00695C"))
-                        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                    })
-                    row.addView(TextView(this@LookupActivity).apply {
-                        text = loc.warehouseName ?: ""
-                        textSize = 12f
-                        setTextColor(Color.parseColor("#888888"))
-                        gravity = Gravity.END
-                    })
-                    binding.layoutLocations.addView(row)
-                }
-            } catch (_: Exception) { }
+        binding.txtLocationHeader.visibility = View.VISIBLE
+        for (loc in locations) {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, dpToPx(2), 0, dpToPx(2))
+            }
+            row.addView(TextView(this).apply {
+                text = loc.shelfName ?: "-"
+                textSize = 14f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(Color.parseColor("#00695C"))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            })
+            row.addView(TextView(this).apply {
+                text = loc.warehouseName ?: ""
+                textSize = 12f
+                setTextColor(Color.parseColor("#888888"))
+                gravity = Gravity.END
+            })
+            binding.layoutLocations.addView(row)
         }
     }
 

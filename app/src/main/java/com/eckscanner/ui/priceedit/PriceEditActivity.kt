@@ -96,8 +96,10 @@ class PriceEditActivity : AppCompatActivity() {
             val baseUrl = config?.first?.trimEnd('/') ?: ""
             binding.imgProduct.visibility = View.VISIBLE
             binding.imgProduct.load("$baseUrl/storage/$image") {
-                crossfade(true)
+                crossfade(false)
                 transformations(RoundedCornersTransformation(8f))
+                placeholder(android.R.drawable.ic_menu_gallery)
+                error(android.R.drawable.ic_menu_gallery)
             }
         } else {
             binding.imgProduct.visibility = View.GONE
