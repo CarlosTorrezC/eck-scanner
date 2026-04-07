@@ -72,63 +72,115 @@
         android:layout_height="1dp"
         android:background="#E0E0E0" />
 
-    <!-- Module buttons -->
+    <!-- Module buttons - 3x2 grid -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="24dp">
+        android:padding="12dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLookup"
+        <!-- Row 1 -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginBottom="12dp"
-            android:text="@string/lookup_title"
-            android:textSize="22sp"
-            app:icon="@android:drawable/ic_menu_search"
-            app:iconGravity="start"
-            app:iconSize="32dp" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCount"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLookup"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="@string/lookup_title"
+                android:textSize="16sp"
+                app:icon="@android:drawable/ic_menu_search"
+                app:iconGravity="top"
+                app:iconSize="28dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPriceCheck"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="@string/price_checker_title"
+                android:textSize="16sp"
+                app:backgroundTint="#D84315"
+                app:icon="@android:drawable/ic_menu_view"
+                app:iconGravity="top"
+                app:iconSize="28dp" />
+        </LinearLayout>
+
+        <!-- Row 2 -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginBottom="12dp"
-            android:text="@string/count_title"
-            android:textSize="22sp"
-            app:backgroundTint="#0F3460"
-            app:icon="@android:drawable/ic_menu_agenda"
-            app:iconGravity="start"
-            app:iconSize="32dp" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnTransfer"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCount"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="@string/count_title"
+                android:textSize="16sp"
+                app:backgroundTint="#0F3460"
+                app:icon="@android:drawable/ic_menu_agenda"
+                app:iconGravity="top"
+                app:iconSize="28dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTransfer"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="@string/transfer_title"
+                android:textSize="16sp"
+                app:backgroundTint="#533483"
+                app:icon="@android:drawable/ic_menu_send"
+                app:iconGravity="top"
+                app:iconSize="28dp" />
+        </LinearLayout>
+
+        <!-- Row 3 -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginBottom="12dp"
-            android:text="@string/transfer_title"
-            android:textSize="22sp"
-            app:backgroundTint="#533483"
-            app:icon="@android:drawable/ic_menu_send"
-            app:iconGravity="start"
-            app:iconSize="32dp" />
+            android:orientation="horizontal">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnShelves"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="@string/shelves_title"
-            android:textSize="22sp"
-            app:backgroundTint="#00695C"
-            app:icon="@android:drawable/ic_menu_sort_by_size"
-            app:iconGravity="start"
-            app:iconSize="32dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnShelves"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="@string/shelves_title"
+                android:textSize="16sp"
+                app:backgroundTint="#00695C"
+                app:icon="@android:drawable/ic_menu_sort_by_size"
+                app:iconGravity="top"
+                app:iconSize="28dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLocation"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="@string/location_finder_title"
+                android:textSize="16sp"
+                app:backgroundTint="#37474F"
+                app:icon="@android:drawable/ic_menu_myplaces"
+                app:iconGravity="top"
+                app:iconSize="28dp" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

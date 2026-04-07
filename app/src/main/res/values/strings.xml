@@ -59,6 +59,14 @@
     <string name="transfer_created">Transferencia creada</string>
     <string name="items_count">%d items</string>
 
+    <!-- Price Checker -->
+    <string name="price_checker_title">Verificar Precio</string>
+    <string name="price_checker_desc">Escanea y ve el precio</string>
+
+    <!-- Location Finder -->
+    <string name="location_finder_title">Buscar Ubicacion</string>
+    <string name="location_finder_desc">Donde esta el producto</string>
+
     <!-- Shelves -->
     <string name="shelves_title">Estantes</string>
     <string name="shelves_desc">Ubicacion de productos</string>

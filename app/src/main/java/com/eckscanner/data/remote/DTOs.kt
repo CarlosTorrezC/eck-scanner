@@ -22,7 +22,16 @@ data class WarehousesResponse(
 data class BarcodeResponse(
     val product: BarcodeProductDto,
     val variant: BarcodeVariantDto?,
-    val stock: List<BarcodeStockDto>
+    val stock: List<BarcodeStockDto>,
+    val locations: List<BarcodeLocationDto>?
+)
+
+data class BarcodeLocationDto(
+    @SerializedName("shelf_id") val shelfId: Int,
+    @SerializedName("shelf_name") val shelfName: String?,
+    @SerializedName("shelf_code") val shelfCode: String?,
+    @SerializedName("warehouse_id") val warehouseId: Int,
+    @SerializedName("warehouse_name") val warehouseName: String?
 )
 
 data class StockAdjustmentResponse(
