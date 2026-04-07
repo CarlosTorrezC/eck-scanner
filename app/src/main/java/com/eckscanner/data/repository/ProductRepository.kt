@@ -17,7 +17,7 @@ class ProductRepository(private val context: Context) {
     // --- Local lookups (instant, offline) ---
 
     suspend fun findByCode(code: String): LookupResult? {
-        // Try variant SKU first
+        // 1. Try exact variant SKU match (e.g., "52193094-298")
         val variant = variantDao.findBySku(code)
         if (variant != null) {
             val product = productDao.getById(variant.productId) ?: return null
@@ -25,29 +25,41 @@ class ProductRepository(private val context: Context) {
             return LookupResult(product.product, variant, product.variants, stock)
         }
 
-        // Try product code/barcode
+        // 2. Try hyphenated format: extract product code + find variant
+        if (code.contains("-")) {
+            val productCode = code.substringBefore("-")
+            val pw = productDao.findByCode(productCode)
+            if (pw != null) {
+                // Try to match variant by full SKU or suffix
+                val matchedVariant = pw.variants.find { it.sku == code }
+                    ?: pw.variants.find { it.sku.endsWith("-" + code.substringAfter("-")) }
+
+                if (matchedVariant != null) {
+                    val stock = stockDao.getForProduct(pw.product.id, matchedVariant.id)
+                    return LookupResult(pw.product, matchedVariant, pw.variants, stock)
+                }
+
+                // Variant code not matched but product found - show all variants with all stock
+                val allStock = stockDao.getAllForProduct(pw.product.id)
+                return LookupResult(pw.product, null, pw.variants, allStock)
+            }
+        }
+
+        // 3. Try product code/barcode exact match
         val productWithVariants = productDao.findByCode(code)
         if (productWithVariants != null) {
-            val stock = stockDao.getForProduct(productWithVariants.product.id)
+            // If product has variants, get ALL stock (all variants combined)
+            val stock = if (productWithVariants.product.hasVariants) {
+                stockDao.getAllForProduct(productWithVariants.product.id)
+            } else {
+                stockDao.getForProduct(productWithVariants.product.id)
+            }
             return LookupResult(
                 productWithVariants.product,
                 null,
                 productWithVariants.variants,
                 stock
             )
-        }
-
-        // Try extracting product code from hyphenated format (e.g., "123456-789")
-        if (code.contains("-")) {
-            val productCode = code.substringBefore("-")
-            val pw = productDao.findByCode(productCode)
-            if (pw != null) {
-                val variantSuffix = code.substringAfter("-")
-                val matchedVariant = pw.variants.find { it.sku == code || it.sku.endsWith(variantSuffix) }
-                val vid = matchedVariant?.id ?: 0
-                val stock = stockDao.getForProduct(pw.product.id, vid)
-                return LookupResult(pw.product, matchedVariant, pw.variants, stock)
-            }
         }
 
         return null
@@ -62,7 +74,12 @@ class ProductRepository(private val context: Context) {
     }
 
     suspend fun getStockInWarehouse(productId: Int, variantId: Int = 0, warehouseId: Int): StockEntity? {
-        return stockDao.getForProductInWarehouse(productId, variantId, warehouseId)
+        return if (variantId == 0) {
+            // No variant specified - sum all variants for this product
+            stockDao.getTotalForProductInWarehouse(productId, warehouseId)
+        } else {
+            stockDao.getForProductInWarehouse(productId, variantId, warehouseId)
+        }
     }
 
     // --- Online lookup (fallback when not in cache) ---

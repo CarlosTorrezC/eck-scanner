@@ -28,8 +28,11 @@ interface ProductDao {
 
 @Dao
 interface VariantDao {
-    @Query("SELECT * FROM variants WHERE sku = :sku LIMIT 1")
-    suspend fun findBySku(sku: String): VariantEntity?
+    @Query("SELECT * FROM variants WHERE sku = :code OR sku = :code LIMIT 1")
+    suspend fun findBySku(code: String): VariantEntity?
+
+    @Query("SELECT * FROM variants WHERE product_id = :productId AND sku = :sku LIMIT 1")
+    suspend fun findByProductAndSku(productId: Int, sku: String): VariantEntity?
 
     @Query("SELECT * FROM variants WHERE product_id = :productId AND active = 1")
     suspend fun getByProductId(productId: Int): List<VariantEntity>
@@ -51,10 +54,24 @@ interface StockDao {
 
     @Query("""
         SELECT * FROM stock
+        WHERE product_id = :productId
+    """)
+    suspend fun getAllForProduct(productId: Int): List<StockEntity>
+
+    @Query("""
+        SELECT * FROM stock
         WHERE product_id = :productId AND variant_id = :variantId AND warehouse_id = :warehouseId
         LIMIT 1
     """)
     suspend fun getForProductInWarehouse(productId: Int, variantId: Int = 0, warehouseId: Int): StockEntity?
+
+    @Query("""
+        SELECT product_id, 0 as variant_id, warehouse_id,
+               SUM(quantity) as quantity, SUM(available) as available
+        FROM stock
+        WHERE product_id = :productId AND warehouse_id = :warehouseId
+    """)
+    suspend fun getTotalForProductInWarehouse(productId: Int, warehouseId: Int): StockEntity?
 
     @Upsert
     suspend fun upsertAll(stock: List<StockEntity>)
