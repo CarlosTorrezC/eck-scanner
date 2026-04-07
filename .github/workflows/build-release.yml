@@ -32,18 +32,28 @@ jobs:
       - name: Get version info
         id: version
         run: |
-          VERSION_NAME=$(grep 'versionName' app/build.gradle.kts | head -1 | grep -oP '"\K[^"]+')
-          VERSION_CODE=$(grep 'versionCode' app/build.gradle.kts | head -1 | grep -oP '\d+')
-          SHORT_SHA=${GITHUB_SHA::7}
-          echo "tag=v${VERSION_NAME}-build.${VERSION_CODE}.${SHORT_SHA}" >> $GITHUB_OUTPUT
-          echo "name=ECK Scanner v${VERSION_NAME} (build ${VERSION_CODE})" >> $GITHUB_OUTPUT
+          COUNT=$(git rev-list --count HEAD)
+          MAJOR=1
+          MINOR=$((COUNT / 10))
+          PATCH=$((COUNT % 10))
+          VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version_name=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_code=$COUNT" >> $GITHUB_OUTPUT
+          echo "tag=v${VERSION}" >> $GITHUB_OUTPUT
+          echo "apk_name=ECKScanner-v${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Find APK
+        id: apk
+        run: |
+          APK=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
+          echo "path=$APK" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: ${{ steps.version.outputs.name }}
-          files: app/build/outputs/apk/release/app-release.apk
+          name: "ECK Scanner ${{ steps.version.outputs.tag }}"
+          files: ${{ steps.apk.outputs.path }}
           make_latest: true
           generate_release_notes: true
         env:
@@ -55,4 +65,4 @@ jobs:
           echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -t ed25519 ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-          scp -i ~/.ssh/deploy_key app/build/outputs/apk/release/app-release.apk ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
+          scp -i ~/.ssh/deploy_key ${{ steps.apk.outputs.path }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}

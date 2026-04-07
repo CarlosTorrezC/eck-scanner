@@ -4,6 +4,21 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+fun gitVersionCode(): Int {
+    return try {
+        val process = Runtime.getRuntime().exec("git rev-list --count HEAD")
+        process.inputStream.bufferedReader().readLine().trim().toInt()
+    } catch (_: Exception) { 1 }
+}
+
+fun gitVersionName(): String {
+    val count = gitVersionCode()
+    val major = 1
+    val minor = count / 10
+    val patch = count % 10
+    return "$major.$minor.$patch"
+}
+
 android {
     namespace = "com.eckscanner"
     compileSdk = 34
@@ -12,8 +27,11 @@ android {
         applicationId = "com.eckscanner"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = gitVersionCode()
+        versionName = gitVersionName()
+
+        // Rename APK to ECKScanner-v{version}.apk
+        setProperty("archivesBaseName", "ECKScanner-v${gitVersionName()}")
     }
 
     signingConfigs {
