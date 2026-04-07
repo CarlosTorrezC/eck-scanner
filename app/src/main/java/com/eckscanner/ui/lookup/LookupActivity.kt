@@ -18,6 +18,8 @@ import com.eckscanner.data.repository.ProductRepository
 import com.eckscanner.databinding.ActivityLookupBinding
 import com.eckscanner.scanner.DataWedgeReceiver
 import com.eckscanner.scanner.ScanFeedback
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import kotlinx.coroutines.launch
 
 class LookupActivity : AppCompatActivity() {
@@ -99,6 +101,22 @@ class LookupActivity : AppCompatActivity() {
         // Price (safe for null variant prices)
         val price = result.matchedVariant?.price ?: result.product.salePrice
         binding.txtPrice.text = String.format("%.2f", price ?: 0.0)
+
+        // Product image
+        val image = result.product.image
+        if (!image.isNullOrEmpty()) {
+            val config = ApiClient.getConfig(this)
+            val baseUrl = config?.first?.trimEnd('/') ?: ""
+            val imageUrl = "$baseUrl/storage/$image"
+            binding.imgProduct.visibility = View.VISIBLE
+            binding.imgProduct.load(imageUrl) {
+                crossfade(true)
+                transformations(RoundedCornersTransformation(16f))
+                error(android.R.drawable.ic_menu_gallery)
+            }
+        } else {
+            binding.imgProduct.visibility = View.GONE
+        }
 
         // Product info
         binding.txtProductName.text = result.product.name

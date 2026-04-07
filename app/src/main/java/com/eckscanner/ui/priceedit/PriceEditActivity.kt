@@ -13,6 +13,8 @@ import com.eckscanner.data.repository.ProductRepository
 import com.eckscanner.databinding.ActivityPriceEditBinding
 import com.eckscanner.scanner.DataWedgeReceiver
 import com.eckscanner.scanner.ScanFeedback
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import kotlinx.coroutines.launch
 
 class PriceEditActivity : AppCompatActivity() {
@@ -87,6 +89,20 @@ class PriceEditActivity : AppCompatActivity() {
         binding.txtProductName.text = result.product.name
         binding.txtCode.text = result.matchedVariant?.sku ?: result.product.code
 
+        // Product image
+        val image = result.product.image
+        if (!image.isNullOrEmpty()) {
+            val config = ApiClient.getConfig(this)
+            val baseUrl = config?.first?.trimEnd('/') ?: ""
+            binding.imgProduct.visibility = View.VISIBLE
+            binding.imgProduct.load("$baseUrl/storage/$image") {
+                crossfade(true)
+                transformations(RoundedCornersTransformation(8f))
+            }
+        } else {
+            binding.imgProduct.visibility = View.GONE
+        }
+
         if (result.matchedVariant != null) {
             binding.txtVariant.visibility = View.VISIBLE
             binding.txtVariant.text = result.matchedVariant.name
@@ -94,7 +110,7 @@ class PriceEditActivity : AppCompatActivity() {
             binding.txtVariant.visibility = View.GONE
         }
 
-        binding.txtCurrentPrice.text = "Bs. ${String.format("%.2f", currentPrice)}"
+        binding.txtCurrentPrice.text = "$ ${String.format("%.2f", currentPrice)}"
 
         // Set current price in edit field and select all for quick replace
         binding.editNewPrice.setText(String.format("%.2f", currentPrice))
@@ -141,7 +157,7 @@ class PriceEditActivity : AppCompatActivity() {
                     ScanFeedback.success(this@PriceEditActivity)
                     val body = response.body()
 
-                    binding.txtCurrentPrice.text = "Bs. ${String.format("%.2f", newPrice)}"
+                    binding.txtCurrentPrice.text = "$ ${String.format("%.2f", newPrice)}"
                     currentPrice = newPrice
 
                     binding.txtSuccess.text = "Precio actualizado: Bs. ${String.format("%.2f", body?.oldPrice ?: 0.0)} → Bs. ${String.format("%.2f", newPrice)}"

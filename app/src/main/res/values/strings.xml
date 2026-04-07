@@ -30,7 +30,7 @@
     <!-- Lookup -->
     <string name="scan_product">Escanea un producto</string>
     <string name="product_not_found">Producto no encontrado</string>
-    <string name="price">Precio: Bs %s</string>
+    <string name="price">Precio: $ %s</string>
     <string name="variant">Variante: %s</string>
     <string name="stock_in">Stock en %1$s: %2$s</string>
     <string name="no_stock">Sin stock</string>
