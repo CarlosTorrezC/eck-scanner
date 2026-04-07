@@ -171,18 +171,13 @@ class LookupActivity : AppCompatActivity() {
 
     private fun showVariantStock(result: LookupResult, currentWarehouseId: Int) {
         val stockByVariant = result.stock.groupBy { it.variantId }
-        var noStockCount = 0
 
         for (variant in result.allVariants) {
             val isScanned = variant.id == result.matchedVariant?.id
             val variantStocks = stockByVariant[variant.id] ?: emptyList()
             val totalQty = variantStocks.sumOf { it.available }
 
-            // Skip variants with no stock (unless it's the scanned one)
-            if (totalQty <= 0 && !isScanned) {
-                noStockCount++
-                continue
-            }
+            // Show all variants regardless of stock
 
             // Variant row: name + total
             val header = LinearLayout(this).apply {
@@ -233,16 +228,6 @@ class LookupActivity : AppCompatActivity() {
                 })
                 binding.layoutStock.addView(row)
             }
-        }
-
-        // Show count of variants without stock
-        if (noStockCount > 0) {
-            binding.layoutStock.addView(TextView(this).apply {
-                text = "+ $noStockCount variantes sin stock"
-                textSize = 11f
-                setTextColor(Color.parseColor("#999999"))
-                setPadding(0, dpToPx(2), 0, 0)
-            })
         }
 
         // Total
