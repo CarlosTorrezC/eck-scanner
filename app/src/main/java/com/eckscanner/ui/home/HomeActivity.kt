@@ -1,6 +1,8 @@
 package com.eckscanner.ui.home
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
@@ -8,6 +10,8 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.eckscanner.data.local.AppDatabase
@@ -239,20 +243,37 @@ class HomeActivity : AppCompatActivity() {
             .show()
     }
 
+    private var pendingUpdate: AppUpdater.UpdateInfo? = null
+
     private fun checkForUpdate() {
         lifecycleScope.launch {
             val update = AppUpdater.checkForUpdate(this@HomeActivity) ?: return@launch
+            pendingUpdate = update
             AlertDialog.Builder(this@HomeActivity)
                 .setTitle("Actualizacion disponible")
                 .setMessage(update.releaseName)
-                .setPositiveButton("Descargar") { _, _ ->
-                    AppUpdater.downloadAndInstall(this@HomeActivity, update)
-                    Toast.makeText(this@HomeActivity, "Descargando... revisa notificaciones", Toast.LENGTH_LONG).show()
-                }
+                .setPositiveButton("Descargar") { _, _ -> startDownload(update) }
                 .setNegativeButton("Despues") { _, _ ->
                     AppUpdater.skipVersion(this@HomeActivity, update.tagName)
                 }
                 .show()
+        }
+    }
+
+    private fun startDownload(update: AppUpdater.UpdateInfo) {
+        // Check storage permission for Android 8
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 100)
+            return
+        }
+        AppUpdater.downloadAndInstall(this, update)
+        Toast.makeText(this, "Descargando... revisa notificaciones", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            pendingUpdate?.let { startDownload(it) }
         }
     }
 

@@ -2,14 +2,10 @@ package com.eckscanner.sync
 
 import android.app.DownloadManager
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Environment
-import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
-import java.io.File
 import java.net.URL
 
 object AppUpdater {
@@ -31,9 +27,9 @@ object AppUpdater {
             val tagName = json.getString("tag_name")
             val releaseName = json.optString("name", tagName)
 
-            // Compare with current version
-            val currentTag = getCurrentTag(context)
-            if (tagName == currentTag) return@withContext null
+            // Compare with installed app version
+            val installedVersion = getInstalledVersionTag(context)
+            if (tagName == installedVersion) return@withContext null
 
             // Check if user skipped this version
             val skipped = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -59,18 +55,22 @@ object AppUpdater {
     }
 
     fun downloadAndInstall(context: Context, update: UpdateInfo) {
-        val request = DownloadManager.Request(Uri.parse(update.downloadUrl))
-            .setTitle("ECK Scanner ${update.tagName}")
-            .setDescription("Descargando actualizacion...")
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "eck-scanner-${update.tagName}.apk")
-            .setMimeType("application/vnd.android.package-archive")
+        try {
+            val request = DownloadManager.Request(Uri.parse(update.downloadUrl))
+                .setTitle("ECK Scanner ${update.tagName}")
+                .setDescription("Descargando actualizacion...")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "ECKScanner-${update.tagName}.apk")
+                .setMimeType("application/vnd.android.package-archive")
 
-        val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        dm.enqueue(request)
-
-        // Save current tag so we don't re-prompt
-        saveCurrentTag(context, update.tagName)
+            val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            dm.enqueue(request)
+        } catch (_: Exception) {
+            // Fallback: open browser to download
+            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, Uri.parse(update.downloadUrl))
+            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+        }
     }
 
     fun skipVersion(context: Context, tagName: String) {
@@ -79,14 +79,12 @@ object AppUpdater {
             .apply()
     }
 
-    private fun getCurrentTag(context: Context): String? {
-        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString("installed_version_tag", null)
-    }
-
-    private fun saveCurrentTag(context: Context, tag: String) {
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-            .putString("installed_version_tag", tag)
-            .apply()
+    private fun getInstalledVersionTag(context: Context): String {
+        return try {
+            val info = context.packageManager.getPackageInfo(context.packageName, 0)
+            "v${info.versionName}"
+        } catch (_: Exception) {
+            ""
+        }
     }
 }
