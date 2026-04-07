@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.eckscanner.data.local.AppDatabase
 import com.eckscanner.data.remote.ApiClient
 import com.eckscanner.databinding.ActivityHomeBinding
+import com.eckscanner.sync.AppUpdater
 import com.eckscanner.sync.SyncManager
 import com.eckscanner.ui.count.CountActivity
 import com.eckscanner.ui.login.LoginActivity
@@ -82,6 +83,9 @@ class HomeActivity : AppCompatActivity() {
 
         // Auto-sync on first open
         performSilentSync()
+
+        // Check for app updates
+        checkForUpdate()
     }
 
     override fun onResume() {
@@ -233,6 +237,23 @@ class HomeActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(com.eckscanner.R.string.cancel), null)
             .show()
+    }
+
+    private fun checkForUpdate() {
+        lifecycleScope.launch {
+            val update = AppUpdater.checkForUpdate(this@HomeActivity) ?: return@launch
+            AlertDialog.Builder(this@HomeActivity)
+                .setTitle("Actualizacion disponible")
+                .setMessage(update.releaseName)
+                .setPositiveButton("Descargar") { _, _ ->
+                    AppUpdater.downloadAndInstall(this@HomeActivity, update)
+                    Toast.makeText(this@HomeActivity, "Descargando... revisa notificaciones", Toast.LENGTH_LONG).show()
+                }
+                .setNegativeButton("Despues") { _, _ ->
+                    AppUpdater.skipVersion(this@HomeActivity, update.tagName)
+                }
+                .show()
+        }
     }
 
     companion object {
