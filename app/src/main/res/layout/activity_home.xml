@@ -56,7 +56,7 @@
         app:iconTint="@android:color/white"
         app:iconSize="20dp" />
 
-    <!-- 3x2 Grid - flat rectangular buttons, edge to edge -->
+    <!-- 2x2 Grid - 4 big flat buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -64,7 +64,7 @@
         android:orientation="vertical"
         android:padding="6dp">
 
-        <!-- Row 1: Consulta | Precio -->
+        <!-- Row 1: Consulta | Conteo -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -79,62 +79,27 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="2dp"
                 android:text="CONSULTA\nPRODUCTO"
-                android:textSize="15sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="4dp"
                 app:backgroundTint="#1A1A2E"
                 app:cornerRadius="6dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPriceCheck"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginStart="2dp"
-                android:text="VERIFICAR\nPRECIO"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:lineSpacingExtra="4dp"
-                app:backgroundTint="#BF360C"
-                app:cornerRadius="6dp" />
-        </LinearLayout>
-
-        <!-- Row 2: Conteo | Transferencias -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:layout_marginBottom="4dp">
-
-            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCount"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_marginEnd="2dp"
+                android:layout_marginStart="2dp"
                 android:text="CONTEO\nINVENTARIO"
-                android:textSize="15sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="4dp"
                 app:backgroundTint="#0D47A1"
                 app:cornerRadius="6dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnTransfer"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginStart="2dp"
-                android:text="TRANS-\nFERENCIAS"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:lineSpacingExtra="4dp"
-                app:backgroundTint="#4A148C"
-                app:cornerRadius="6dp" />
         </LinearLayout>
 
-        <!-- Row 3: Estantes | Ubicacion -->
+        <!-- Row 2: Transferencias | Estantes -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -142,29 +107,29 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnShelves"
+                android:id="@+id/btnTransfer"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginEnd="2dp"
-                android:text="ESCANEAR\nESTANTES"
-                android:textSize="15sp"
+                android:text="TRANS-\nFERENCIAS"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="4dp"
-                app:backgroundTint="#004D40"
+                app:backgroundTint="#4A148C"
                 app:cornerRadius="6dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLocation"
+                android:id="@+id/btnShelves"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginStart="2dp"
-                android:text="BUSCAR\nUBICACION"
-                android:textSize="15sp"
+                android:text="ESCANEAR\nESTANTES"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="4dp"
-                app:backgroundTint="#37474F"
+                app:backgroundTint="#004D40"
                 app:cornerRadius="6dp" />
         </LinearLayout>
     </LinearLayout>

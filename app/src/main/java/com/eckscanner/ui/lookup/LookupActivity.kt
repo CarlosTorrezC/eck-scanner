@@ -1,5 +1,7 @@
 package com.eckscanner.ui.lookup
 
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -12,7 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import com.eckscanner.R
 import com.eckscanner.data.local.AppDatabase
 import com.eckscanner.data.local.StockEntity
-import com.eckscanner.data.local.VariantEntity
+import com.eckscanner.data.remote.ApiClient
+import com.eckscanner.data.remote.BarcodeLocationDto
 import com.eckscanner.data.repository.LookupResult
 import com.eckscanner.data.repository.ProductRepository
 import com.eckscanner.databinding.ActivityLookupBinding
@@ -61,32 +64,34 @@ class LookupActivity : AppCompatActivity() {
         lifecycleScope.launch {
             // Try local first (instant)
             var result = repository.findByCode(code)
-
-            // Fallback to online
             if (result == null) {
                 result = repository.lookupOnline(code)
             }
 
             if (result != null) {
-                showResult(result)
+                showResult(result, code)
             } else {
                 showNotFound()
             }
         }
     }
 
-    private suspend fun showResult(result: LookupResult) {
+    private fun showResult(result: LookupResult, scannedCode: String) {
         binding.txtScanPrompt.visibility = View.GONE
         binding.txtNotFound.visibility = View.GONE
         binding.scrollResult.visibility = View.VISIBLE
 
+        // Price - big
+        val price = result.matchedVariant?.price ?: result.product.salePrice
+        binding.txtPrice.text = String.format("%.2f", price)
+
+        // Product info
         binding.txtProductName.text = result.product.name
-        binding.txtProductCode.text = "Cod: ${result.product.code}" +
-                (result.product.barcode?.let { " | BC: $it" } ?: "")
+        binding.txtProductCode.text = result.matchedVariant?.sku ?: result.product.code
 
         if (result.matchedVariant != null) {
             binding.txtVariant.visibility = View.VISIBLE
-            binding.txtVariant.text = getString(R.string.variant, result.matchedVariant.name)
+            binding.txtVariant.text = result.matchedVariant.name
         } else if (result.allVariants.isNotEmpty()) {
             binding.txtVariant.visibility = View.VISIBLE
             binding.txtVariant.text = "${result.allVariants.size} variantes"
@@ -95,57 +100,116 @@ class LookupActivity : AppCompatActivity() {
         }
 
         val cats = listOfNotNull(result.product.categoryName, result.product.brandName)
-        binding.txtCategoryBrand.text = cats.joinToString(" | ")
-        binding.txtCategoryBrand.visibility = if (cats.isEmpty()) View.GONE else View.VISIBLE
-
-        val price = result.matchedVariant?.price ?: result.product.salePrice
-        binding.txtPrice.text = getString(R.string.price, String.format("%.2f", price))
+        if (cats.isNotEmpty()) {
+            binding.txtCategoryBrand.visibility = View.VISIBLE
+            binding.txtCategoryBrand.text = cats.joinToString(" | ")
+        } else {
+            binding.txtCategoryBrand.visibility = View.GONE
+        }
 
         // Stock by warehouse
         binding.layoutStock.removeAllViews()
         val db = AppDatabase.getInstance(this)
+        val currentWarehouseId = ApiClient.getWarehouseId(this)
 
-        if (result.stock.isNotEmpty()) {
-            val grouped = result.stock.groupBy { it.warehouseId }
-            for ((warehouseId, stocks) in grouped) {
-                val warehouse = db.warehouseDao().getById(warehouseId)
-                val warehouseName = warehouse?.name ?: "Almacen #$warehouseId"
-                val totalQty = stocks.sumOf { it.quantity }
-                val totalAvail = stocks.sumOf { it.available }
+        lifecycleScope.launch {
+            if (result.stock.isNotEmpty()) {
+                val grouped = result.stock.groupBy { it.warehouseId }
+                for ((warehouseId, stocks) in grouped) {
+                    val warehouse = db.warehouseDao().getById(warehouseId)
+                    val warehouseName = warehouse?.name ?: "Almacen #$warehouseId"
+                    val totalAvail = stocks.sumOf { it.available }
+                    val isCurrent = warehouseId == currentWarehouseId
 
-                val row = LinearLayout(this).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    setPadding(0, 4, 0, 4)
+                    val row = LinearLayout(this@LookupActivity).apply {
+                        orientation = LinearLayout.HORIZONTAL
+                        setPadding(0, dpToPx(3), 0, dpToPx(3))
+                        if (isCurrent) {
+                            setBackgroundColor(Color.parseColor("#E8F5E9"))
+                            setPadding(dpToPx(6), dpToPx(4), dpToPx(6), dpToPx(4))
+                        }
+                    }
+
+                    val nameView = TextView(this@LookupActivity).apply {
+                        text = if (isCurrent) "$warehouseName *" else warehouseName
+                        textSize = 14f
+                        if (isCurrent) setTypeface(null, Typeface.BOLD)
+                        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                    }
+
+                    val qtyView = TextView(this@LookupActivity).apply {
+                        text = "${totalAvail.toInt()}"
+                        textSize = 17f
+                        setTypeface(null, Typeface.BOLD)
+                        gravity = Gravity.END
+                        setTextColor(
+                            if (totalAvail > 0) Color.parseColor("#2E7D32")
+                            else Color.parseColor("#C62828")
+                        )
+                    }
+
+                    row.addView(nameView)
+                    row.addView(qtyView)
+                    binding.layoutStock.addView(row)
                 }
-
-                val nameView = TextView(this).apply {
-                    text = warehouseName
-                    textSize = 15f
-                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            } else {
+                val noStock = TextView(this@LookupActivity).apply {
+                    text = getString(R.string.no_stock)
+                    textSize = 14f
+                    setTextColor(Color.parseColor("#C62828"))
                 }
-
-                val qtyView = TextView(this).apply {
-                    text = "${totalAvail.toInt()}"
-                    textSize = 18f
-                    setTypeface(null, android.graphics.Typeface.BOLD)
-                    gravity = Gravity.END
-                    setTextColor(
-                        if (totalAvail > 0) android.graphics.Color.parseColor("#2E7D32")
-                        else android.graphics.Color.parseColor("#C62828")
-                    )
-                }
-
-                row.addView(nameView)
-                row.addView(qtyView)
-                binding.layoutStock.addView(row)
+                binding.layoutStock.addView(noStock)
             }
-        } else {
-            val noStock = TextView(this).apply {
-                text = getString(R.string.no_stock)
-                textSize = 15f
-                setTextColor(android.graphics.Color.parseColor("#C62828"))
+
+            // Locations - fetch online
+            fetchLocations(result)
+        }
+    }
+
+    private fun fetchLocations(result: LookupResult) {
+        binding.layoutLocations.removeAllViews()
+
+        lifecycleScope.launch {
+            try {
+                val code = result.matchedVariant?.sku ?: result.product.code
+                val response = ApiClient.getService().lookupBarcode(code)
+                if (!response.isSuccessful) return@launch
+                val locations = response.body()?.locations ?: return@launch
+
+                if (locations.isNotEmpty()) {
+                    binding.txtLocationHeader.visibility = View.VISIBLE
+                    for (loc in locations) {
+                        val row = LinearLayout(this@LookupActivity).apply {
+                            orientation = LinearLayout.HORIZONTAL
+                            setPadding(0, dpToPx(2), 0, dpToPx(2))
+                        }
+
+                        val shelfView = TextView(this@LookupActivity).apply {
+                            text = loc.shelfName ?: "Sin nombre"
+                            textSize = 14f
+                            setTypeface(null, Typeface.BOLD)
+                            setTextColor(Color.parseColor("#00695C"))
+                            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                        }
+
+                        val warehouseView = TextView(this@LookupActivity).apply {
+                            text = loc.warehouseName ?: ""
+                            textSize = 12f
+                            setTextColor(Color.parseColor("#888888"))
+                            gravity = Gravity.END
+                        }
+
+                        row.addView(shelfView)
+                        row.addView(warehouseView)
+                        binding.layoutLocations.addView(row)
+                    }
+                } else {
+                    binding.txtLocationHeader.visibility = View.GONE
+                }
+            } catch (_: Exception) {
+                // Silently fail - locations are secondary info
+                binding.txtLocationHeader.visibility = View.GONE
             }
-            binding.layoutStock.addView(noStock)
         }
     }
 
@@ -154,4 +218,6 @@ class LookupActivity : AppCompatActivity() {
         binding.scrollResult.visibility = View.GONE
         binding.txtNotFound.visibility = View.VISIBLE
     }
+
+    private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
 }
