@@ -38,6 +38,12 @@ class PriceEditActivity : AppCompatActivity() {
 
         binding.btnSave.setOnClickListener { savePrice() }
 
+        // Done button on numeric keyboard triggers save
+        binding.editNewPrice.setOnEditorActionListener { _, _, _ ->
+            savePrice()
+            true
+        }
+
         scanReceiver = DataWedgeReceiver { code ->
             runOnUiThread { lookup(code) }
         }
