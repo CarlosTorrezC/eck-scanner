@@ -57,6 +57,7 @@ class ShelfScanActivity : AppCompatActivity() {
         binding.recyclerItems.adapter = adapter
 
         binding.btnSave.setOnClickListener { saveShelf() }
+        binding.btnClear.setOnClickListener { clearShelf() }
 
         scanReceiver = DataWedgeReceiver { code ->
             runOnUiThread { onScan(code) }
@@ -224,6 +225,21 @@ class ShelfScanActivity : AppCompatActivity() {
 
     private fun updateCount() {
         binding.txtItemCount.text = "${items.size} productos"
+    }
+
+    private fun clearShelf() {
+        AlertDialog.Builder(this)
+            .setTitle("Limpiar estante")
+            .setMessage("Se eliminaran todos los productos de $shelfName. Continuar?")
+            .setPositiveButton("Limpiar") { _, _ ->
+                items.clear()
+                adapter.notifyDataSetChanged()
+                binding.cardLastScan.visibility = View.GONE
+                updateCount()
+                doSave()
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
     }
 
     private fun saveShelf() {

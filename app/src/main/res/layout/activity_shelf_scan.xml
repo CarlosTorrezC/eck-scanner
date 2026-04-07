@@ -86,19 +86,30 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClear"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="LIMPIAR"
+            android:textSize="12sp"
+            app:backgroundTint="#B71C1C"
+            app:cornerRadius="4dp" />
+
         <TextView
             android:id="@+id/txtItemCount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="14sp" />
+            android:gravity="center"
+            android:textSize="13sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/save_shelf"
-            android:textSize="14sp"
-            app:backgroundTint="#00695C" />
+            android:layout_height="40dp"
+            android:text="GUARDAR"
+            android:textSize="12sp"
+            app:backgroundTint="#00695C"
+            app:cornerRadius="4dp" />
     </LinearLayout>
 </LinearLayout>
