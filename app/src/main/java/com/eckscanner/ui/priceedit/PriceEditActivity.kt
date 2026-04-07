@@ -6,6 +6,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.eckscanner.data.local.AppDatabase
 import com.eckscanner.data.remote.ApiClient
 import com.eckscanner.data.remote.PriceUpdateRequest
 import com.eckscanner.data.repository.LookupResult
@@ -159,10 +160,24 @@ class PriceEditActivity : AppCompatActivity() {
                     ScanFeedback.success(this@PriceEditActivity)
                     val body = response.body()
 
+                    // Update local DB immediately
+                    val db = AppDatabase.getInstance(this@PriceEditActivity)
+                    if (currentVariantId != null) {
+                        val variant = db.variantDao().findBySku(binding.txtCode.text.toString())
+                        if (variant != null) {
+                            db.variantDao().upsertAll(listOf(variant.copy(price = newPrice)))
+                        }
+                    } else {
+                        val product = db.productDao().getById(currentProductId)
+                        if (product != null) {
+                            db.productDao().upsertAll(listOf(product.product.copy(salePrice = newPrice)))
+                        }
+                    }
+
                     binding.txtCurrentPrice.text = "$ ${String.format("%.2f", newPrice)}"
                     currentPrice = newPrice
 
-                    binding.txtSuccess.text = "Precio actualizado: Bs. ${String.format("%.2f", body?.oldPrice ?: 0.0)} → Bs. ${String.format("%.2f", newPrice)}"
+                    binding.txtSuccess.text = "Precio actualizado: $ ${String.format("%.2f", body?.oldPrice ?: 0.0)} → $ ${String.format("%.2f", newPrice)}"
                     binding.txtSuccess.visibility = View.VISIBLE
 
                     // Hide keyboard

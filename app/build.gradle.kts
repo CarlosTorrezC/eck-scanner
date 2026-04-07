@@ -13,10 +13,7 @@ fun gitVersionCode(): Int {
 
 fun gitVersionName(): String {
     val count = gitVersionCode()
-    val major = 1
-    val minor = count / 10
-    val patch = count % 10
-    return "$major.$minor.$patch"
+    return "1.0.$count"
 }
 
 android {

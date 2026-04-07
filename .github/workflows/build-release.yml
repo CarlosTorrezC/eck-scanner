@@ -35,10 +35,7 @@ jobs:
         id: version
         run: |
           COUNT=$(git rev-list --count HEAD)
-          MAJOR=1
-          MINOR=$((COUNT / 10))
-          PATCH=$((COUNT % 10))
-          VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          VERSION="1.0.${COUNT}"
           echo "version_name=$VERSION" >> $GITHUB_OUTPUT
           echo "version_code=$COUNT" >> $GITHUB_OUTPUT
           echo "tag=v${VERSION}" >> $GITHUB_OUTPUT
