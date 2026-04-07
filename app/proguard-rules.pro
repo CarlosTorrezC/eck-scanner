@@ -1,14 +1,26 @@
 -keepattributes Signature
 -keepattributes *Annotation*
--keepattributes InnerClasses,EnclosingMethod
+-keepattributes InnerClasses,EnclosingMethod,Exceptions
 
-# Retrofit + Gson
--keep class com.eckscanner.data.remote.** { *; }
+# Retrofit
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 -keep interface com.eckscanner.data.remote.ApiService { *; }
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
+
+# Gson - keep all generic type info
+-keep class com.google.gson.** { *; }
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
 -keepclassmembers,allowobfuscation class * {
     @com.google.gson.annotations.SerializedName <fields>;
 }
--keep class com.google.gson.** { *; }
+
+# DTOs - keep all remote data classes
+-keep class com.eckscanner.data.remote.** { *; }
 
 # Room
 -keep class * extends androidx.room.RoomDatabase
