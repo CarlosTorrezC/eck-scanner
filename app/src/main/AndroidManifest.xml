@@ -31,7 +31,7 @@
         <activity android:name=".ui.transfer.TransferListActivity" />
         <activity android:name=".ui.transfer.ReceiveTransferActivity" />
         <activity android:name=".ui.priceedit.PriceEditActivity"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.shelf.ShelfListActivity" />
         <activity android:name=".ui.shelf.ShelfScanActivity" />
     </application>
