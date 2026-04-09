@@ -1,6 +1,5 @@
 package com.eckscanner.ui.transfer
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -48,10 +47,6 @@ class TransferActivity : AppCompatActivity() {
         binding.btnFrom.setOnClickListener { selectWarehouse(true) }
         binding.btnTo.setOnClickListener { selectWarehouse(false) }
         binding.btnCreateTransfer.setOnClickListener { createTransfer() }
-        binding.btnNewTransfer.setOnClickListener { /* Already on new transfer */ }
-        binding.btnListTransfers.setOnClickListener {
-            startActivity(Intent(this, TransferListActivity::class.java))
-        }
 
         // Pre-select current warehouse as origin
         val currentWarehouse = ApiClient.getWarehouseId(this)
@@ -204,9 +199,11 @@ class TransferActivity : AppCompatActivity() {
 
     private fun doCreateTransfer() {
         binding.btnCreateTransfer.isEnabled = false
+        binding.btnCreateTransfer.text = "ENVIANDO..."
 
         lifecycleScope.launch {
             try {
+                // Step 1: Create transfer
                 val request = CreateTransferRequest(
                     fromWarehouseId = fromWarehouseId,
                     toWarehouseId = toWarehouseId,
@@ -220,19 +217,46 @@ class TransferActivity : AppCompatActivity() {
                     }
                 )
 
-                val response = ApiClient.getService().createTransfer(request)
-                if (response.isSuccessful) {
-                    Toast.makeText(this@TransferActivity, getString(R.string.transfer_created), Toast.LENGTH_LONG).show()
-                    scanItems.clear()
-                    adapter.notifyDataSetChanged()
-                    binding.layoutTransferBottom.visibility = View.GONE
-                } else {
-                    Toast.makeText(this@TransferActivity, "Error ${response.code()}", Toast.LENGTH_LONG).show()
+                val createResponse = ApiClient.getService().createTransfer(request)
+                if (!createResponse.isSuccessful) {
+                    val error = createResponse.errorBody()?.string()?.take(100) ?: ""
+                    Toast.makeText(this@TransferActivity, "Error creando: $error", Toast.LENGTH_LONG).show()
+                    return@launch
                 }
+
+                val transferId = createResponse.body()?.data?.id
+                if (transferId == null) {
+                    Toast.makeText(this@TransferActivity, "Error: no se obtuvo ID de transferencia", Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+
+                // Step 2: Send (Pendiente → En Transito)
+                val sendResponse = ApiClient.getService().sendTransfer(transferId)
+                if (!sendResponse.isSuccessful) {
+                    Toast.makeText(this@TransferActivity, "Creada pero error al enviar", Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+
+                // Step 3: Receive all (En Transito → Completada)
+                val receiveResponse = ApiClient.getService().receiveTransfer(transferId, null)
+                if (!receiveResponse.isSuccessful) {
+                    Toast.makeText(this@TransferActivity, "Enviada pero error al recibir", Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+
+                // All done
+                ScanFeedback.success(this@TransferActivity)
+                Toast.makeText(this@TransferActivity, "Transferencia completada", Toast.LENGTH_LONG).show()
+                scanItems.clear()
+                adapter.notifyDataSetChanged()
+                binding.layoutTransferBottom.visibility = View.GONE
+
             } catch (e: Exception) {
+                ScanFeedback.error(this@TransferActivity)
                 Toast.makeText(this@TransferActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             } finally {
                 binding.btnCreateTransfer.isEnabled = true
+                binding.btnCreateTransfer.text = getString(R.string.create_transfer)
             }
         }
     }

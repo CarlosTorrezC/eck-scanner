@@ -15,38 +15,7 @@
         app:navigationIcon="@drawable/ic_back"
         app:navigationIconTint="@android:color/white" />
 
-    <!-- Tab-like buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNewTransfer"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            android:text="@string/new_transfer"
-            android:textSize="13sp"
-            app:backgroundTint="#533483" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnListTransfers"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:text="@string/pending_transfers"
-            android:textSize="13sp"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#E0E0E0" />
+    <!-- Removed tab buttons - single step transfer -->
 
     <!-- New transfer form -->
     <LinearLayout
