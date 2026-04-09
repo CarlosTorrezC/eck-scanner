@@ -151,12 +151,23 @@ class TransferActivity : AppCompatActivity() {
                 Toast.makeText(this@TransferActivity, "No encontrado: $code", Toast.LENGTH_SHORT).show()
                 return@launch
             }
-            ScanFeedback.success(this@TransferActivity)
-
             val productId = result.product.id
             val variantId = result.matchedVariant?.id
 
+            // Check available stock in origin warehouse
+            val stock = repository.getStockInWarehouse(productId, variantId ?: 0, fromWarehouseId)
+            val available = stock?.available ?: 0.0
             val existing = scanItems.find { it.productId == productId && it.variantId == variantId }
+            val alreadyInList = existing?.quantity ?: 0.0
+
+            if (alreadyInList + 1 > available) {
+                ScanFeedback.error(this@TransferActivity)
+                Toast.makeText(this@TransferActivity, "Stock insuficiente: ${available.toInt()} disponible", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            ScanFeedback.success(this@TransferActivity)
+
             if (existing != null) {
                 existing.quantity += 1.0
                 val index = scanItems.indexOf(existing)
