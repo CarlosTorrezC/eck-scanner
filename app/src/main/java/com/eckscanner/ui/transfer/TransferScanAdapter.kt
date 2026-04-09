@@ -2,8 +2,10 @@ package com.eckscanner.ui.transfer
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.eckscanner.databinding.ItemTransferScanBinding
+import com.eckscanner.scanner.ScanFeedback
 
 data class TransferScanItem(
     val productId: Int,
@@ -11,7 +13,8 @@ data class TransferScanItem(
     val productName: String,
     val variantName: String?,
     val code: String,
-    var quantity: Double
+    var quantity: Double,
+    var maxStock: Double = 0.0
 )
 
 class TransferScanAdapter(
@@ -36,6 +39,11 @@ class TransferScanAdapter(
         holder.binding.txtQty.text = item.quantity.toInt().toString()
 
         holder.binding.btnPlus.setOnClickListener {
+            if (item.maxStock > 0 && item.quantity >= item.maxStock) {
+                ScanFeedback.error(holder.itemView.context)
+                Toast.makeText(holder.itemView.context, "Max: ${item.maxStock.toInt()} disponible", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             item.quantity += 1.0
             notifyItemChanged(holder.adapterPosition)
             onQuantityChanged()

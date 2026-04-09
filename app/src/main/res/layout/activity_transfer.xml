@@ -21,39 +21,47 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Warehouse selectors - stacked -->
+        <!-- Warehouse selectors - horizontal, auto-size text -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:paddingHorizontal="6dp"
-            android:paddingTop="6dp">
+            android:paddingVertical="6dp"
+            android:gravity="center_vertical">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnFrom"
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:text="ORIGEN: Seleccionar"
-                android:textSize="12sp"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="2dp"
+                android:text="ORIGEN"
+                android:textSize="10sp"
                 android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
                 app:backgroundTint="#4A148C"
                 app:cornerRadius="4dp" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="↓"
+                android:text="→"
                 android:textSize="16sp"
-                android:textColor="#999"
-                android:gravity="center" />
+                android:textColor="#4A148C" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnTo"
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:text="DESTINO: Seleccionar"
-                android:textSize="12sp"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="2dp"
+                android:text="DESTINO"
+                android:textSize="10sp"
                 android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
                 app:backgroundTint="#00695C"
                 app:cornerRadius="4dp" />
         </LinearLayout>

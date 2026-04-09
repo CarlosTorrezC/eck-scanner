@@ -179,7 +179,8 @@ class TransferActivity : AppCompatActivity() {
                     productName = result.product.name,
                     variantName = result.matchedVariant?.name,
                     code = result.matchedVariant?.sku ?: result.product.code,
-                    quantity = 1.0
+                    quantity = 1.0,
+                    maxStock = available
                 )
                 scanItems.add(0, item)
                 adapter.notifyItemInserted(0)
