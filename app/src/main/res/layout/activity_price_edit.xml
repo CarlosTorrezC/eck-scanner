@@ -26,7 +26,7 @@
         android:textSize="20sp"
         android:textColor="#999" />
 
-    <!-- Content - no scroll -->
+    <!-- Content -->
     <LinearLayout
         android:id="@+id/layoutContent"
         android:layout_width="match_parent"
@@ -34,23 +34,15 @@
         android:orientation="vertical"
         android:visibility="gone">
 
-        <!-- Product info row -->
+        <!-- Product info: name + price on one line, always visible -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:background="#FFF3E0"
-            android:padding="8dp">
-
-            <ImageView
-                android:id="@+id/imgProduct"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:scaleType="centerCrop"
-                android:layout_marginEnd="8dp"
-                android:visibility="gone"
-                android:contentDescription="Producto" />
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -62,26 +54,17 @@
                     android:id="@+id/txtProductName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="#333"
                     android:maxLines="1"
                     android:ellipsize="end" />
 
                 <TextView
-                    android:id="@+id/txtVariant"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="11sp"
-                    android:textColor="#E65100"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
-
-                <TextView
                     android:id="@+id/txtCode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="10sp"
+                    android:textSize="11sp"
                     android:textColor="#888" />
             </LinearLayout>
 
@@ -91,10 +74,25 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#666" />
+                android:textColor="#666"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
 
-        <!-- Price input area - centered, takes remaining space -->
+        <!-- Hidden fields for variant/image (kept for code compatibility) -->
+        <TextView
+            android:id="@+id/txtVariant"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/imgProduct"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:contentDescription="Producto" />
+
+        <!-- New price - centered in remaining space -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -106,7 +104,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="NUEVO PRECIO $"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#E65100" />
 
@@ -114,11 +112,11 @@
                 android:id="@+id/editNewPrice"
                 android:layout_width="180dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:inputType="numberDecimal"
                 android:imeOptions="actionDone"
                 android:singleLine="true"
-                android:textSize="36sp"
+                android:textSize="40sp"
                 android:textStyle="bold"
                 android:textColor="#1B5E20"
                 android:gravity="center"
@@ -131,14 +129,6 @@
                 android:layout_height="2dp"
                 android:background="#1B5E20" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Toca el boton azul del teclado para guardar"
-                android:textSize="11sp"
-                android:textColor="#888" />
-
             <!-- Success message -->
             <TextView
                 android:id="@+id/txtSuccess"
@@ -148,11 +138,11 @@
                 android:textSize="14sp"
                 android:textColor="#2E7D32"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="10dp"
                 android:visibility="gone" />
         </LinearLayout>
 
-        <!-- Save button at bottom -->
+        <!-- Save button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
