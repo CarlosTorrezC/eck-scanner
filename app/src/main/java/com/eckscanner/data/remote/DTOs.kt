@@ -41,8 +41,11 @@ data class StockAdjustmentResponse(
 
 data class TransferResponse(
     val data: TransferDto?,
+    val transfer: TransferDto?,
     val message: String?
-)
+) {
+    fun resolveTransfer(): TransferDto? = data ?: transfer
+}
 
 data class TransferDetailResponse(
     val data: TransferDto

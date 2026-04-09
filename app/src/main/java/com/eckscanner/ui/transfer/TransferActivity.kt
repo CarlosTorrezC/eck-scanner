@@ -224,7 +224,7 @@ class TransferActivity : AppCompatActivity() {
                     return@launch
                 }
 
-                val transferId = createResponse.body()?.data?.id
+                val transferId = createResponse.body()?.resolveTransfer()?.id
                 if (transferId == null) {
                     Toast.makeText(this@TransferActivity, "Error: no se obtuvo ID de transferencia", Toast.LENGTH_LONG).show()
                     return@launch
