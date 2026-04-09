@@ -4,16 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="4dp"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="6dp"
     app:cardElevation="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
+        android:padding="8dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
+        <!-- Remove button -->
+        <ImageButton
+            android:id="@+id/btnRemove"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="Eliminar"
+            android:layout_marginEnd="6dp" />
+
+        <!-- Product info -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -24,7 +35,7 @@
                 android:id="@+id/txtName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
@@ -33,18 +44,34 @@
                 android:id="@+id/txtDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textColor="#666" />
         </LinearLayout>
 
+        <!-- Quantity controls -->
+        <ImageButton
+            android:id="@+id/btnMinus"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@android:drawable/btn_minus"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="Menos" />
+
         <TextView
             android:id="@+id/txtQty"
-            android:layout_width="wrap_content"
+            android:layout_width="36dp"
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#533483"
-            android:minWidth="40dp"
             android:gravity="center" />
+
+        <ImageButton
+            android:id="@+id/btnPlus"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@android:drawable/btn_plus"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="Mas" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

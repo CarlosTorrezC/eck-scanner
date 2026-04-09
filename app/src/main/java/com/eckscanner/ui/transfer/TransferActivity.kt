@@ -41,7 +41,7 @@ class TransferActivity : AppCompatActivity() {
 
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        adapter = TransferScanAdapter(scanItems)
+        adapter = TransferScanAdapter(scanItems) { updateTotal() }
         binding.recyclerTransferItems.layoutManager = LinearLayoutManager(this)
         binding.recyclerTransferItems.adapter = adapter
 
@@ -182,6 +182,14 @@ class TransferActivity : AppCompatActivity() {
                 binding.recyclerTransferItems.scrollToPosition(0)
             }
 
+            updateTotal()
+        }
+    }
+
+    private fun updateTotal() {
+        if (scanItems.isEmpty()) {
+            binding.layoutTransferBottom.visibility = View.GONE
+        } else {
             binding.layoutTransferBottom.visibility = View.VISIBLE
             binding.txtTransferTotal.text = "${scanItems.size} productos | ${scanItems.sumOf { it.quantity }.toInt()} unidades"
         }
