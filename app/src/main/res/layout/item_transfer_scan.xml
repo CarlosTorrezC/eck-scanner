@@ -10,19 +10,22 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:padding="6dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
         <!-- Remove button -->
-        <ImageButton
+        <TextView
             android:id="@+id/btnRemove"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:text="X"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#C62828"
+            android:gravity="center"
             android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="Eliminar"
-            android:layout_marginEnd="6dp" />
+            android:layout_marginEnd="4dp" />
 
         <!-- Product info -->
         <LinearLayout
@@ -37,25 +40,31 @@
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/txtDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="11sp"
-                android:textColor="#666" />
+                android:textSize="10sp"
+                android:textColor="#888" />
         </LinearLayout>
 
         <!-- Quantity controls -->
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnMinus"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@android:drawable/btn_minus"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="Menos" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="-"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            app:backgroundTint="#EEEEEE"
+            android:textColor="#333"
+            app:cornerRadius="4dp" />
 
         <TextView
             android:id="@+id/txtQty"
@@ -63,15 +72,21 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#533483"
+            android:textColor="#4A148C"
             android:gravity="center" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPlus"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@android:drawable/btn_plus"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="Mas" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="+"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            app:backgroundTint="#4A148C"
+            android:textColor="@android:color/white"
+            app:cornerRadius="4dp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

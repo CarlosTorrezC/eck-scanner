@@ -8,74 +8,59 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
-        android:background="#533483"
-        app:title="@string/transfer_title"
+        android:layout_height="40dp"
+        android:background="#4A148C"
+        app:title="TRANSFERENCIAS"
         app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_back"
         app:navigationIconTint="@android:color/white" />
 
-    <!-- Removed tab buttons - single step transfer -->
-
-    <!-- New transfer form -->
     <LinearLayout
         android:id="@+id/layoutNewTransfer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Warehouse selectors -->
+        <!-- Warehouse selectors - compact -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="12dp">
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="6dp">
 
-            <LinearLayout
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFrom"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginEnd="6dp">
+                android:layout_marginEnd="3dp"
+                android:text="ORIGEN"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                app:backgroundTint="#4A148C"
+                app:cornerRadius="4dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/from_warehouse"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="→"
+                android:textSize="20sp"
+                android:textColor="#4A148C"
+                android:layout_gravity="center"
+                android:paddingHorizontal="4dp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnFrom"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:text="@string/select_warehouse"
-                    android:textSize="12sp"
-                    style="@style/Widget.Material3.Button.OutlinedButton" />
-            </LinearLayout>
-
-            <LinearLayout
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTo"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginStart="6dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/to_warehouse"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnTo"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:text="@string/select_warehouse"
-                    android:textSize="12sp"
-                    style="@style/Widget.Material3.Button.OutlinedButton" />
-            </LinearLayout>
+                android:layout_marginStart="3dp"
+                android:text="DESTINO"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                app:backgroundTint="#00695C"
+                app:cornerRadius="4dp" />
         </LinearLayout>
 
         <!-- Scan prompt -->
@@ -84,9 +69,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="16dp"
-            android:text="Selecciona almacenes y escanea productos"
-            android:textSize="14sp"
+            android:padding="8dp"
+            android:text="Escanea los productos a transferir"
+            android:textSize="13sp"
             android:textColor="#888" />
 
         <!-- Scanned items -->
@@ -95,15 +80,15 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:padding="8dp" />
+            android:padding="6dp" />
 
-        <!-- Bottom -->
+        <!-- Bottom bar -->
         <LinearLayout
             android:id="@+id/layoutTransferBottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:background="?colorSurfaceVariant"
+            android:padding="8dp"
+            android:background="#EEEEEE"
             android:gravity="center_vertical"
             android:visibility="gone">
 
@@ -112,15 +97,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="14sp" />
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCreateTransfer"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:text="@string/create_transfer"
+                android:layout_height="44dp"
+                android:text="TRANSFERIR"
                 android:textSize="14sp"
-                app:backgroundTint="#533483" />
+                android:textStyle="bold"
+                app:backgroundTint="#4A148C"
+                app:cornerRadius="4dp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
