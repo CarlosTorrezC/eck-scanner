@@ -12,6 +12,7 @@ import com.eckscanner.data.local.AppDatabase
 import com.eckscanner.data.local.WarehouseEntity
 import com.eckscanner.data.remote.ApiClient
 import com.eckscanner.data.remote.CreateTransferRequest
+import com.eckscanner.data.remote.ReceiveTransferRequest
 import com.eckscanner.data.remote.TransferItemRequest
 import com.eckscanner.data.repository.ProductRepository
 import com.eckscanner.databinding.ActivityTransferBinding
@@ -233,14 +234,18 @@ class TransferActivity : AppCompatActivity() {
                 // Step 2: Send (Pendiente → En Transito)
                 val sendResponse = ApiClient.getService().sendTransfer(transferId)
                 if (!sendResponse.isSuccessful) {
-                    Toast.makeText(this@TransferActivity, "Creada pero error al enviar", Toast.LENGTH_LONG).show()
+                    val err = sendResponse.errorBody()?.string()?.take(100) ?: ""
+                    ScanFeedback.error(this@TransferActivity)
+                    Toast.makeText(this@TransferActivity, "Creada pero error al enviar: $err", Toast.LENGTH_LONG).show()
                     return@launch
                 }
 
                 // Step 3: Receive all (En Transito → Completada)
-                val receiveResponse = ApiClient.getService().receiveTransfer(transferId, null)
+                val receiveResponse = ApiClient.getService().receiveTransfer(transferId, ReceiveTransferRequest(items = null))
                 if (!receiveResponse.isSuccessful) {
-                    Toast.makeText(this@TransferActivity, "Enviada pero error al recibir", Toast.LENGTH_LONG).show()
+                    val err = receiveResponse.errorBody()?.string()?.take(100) ?: ""
+                    ScanFeedback.error(this@TransferActivity)
+                    Toast.makeText(this@TransferActivity, "Enviada pero error al recibir: $err", Toast.LENGTH_LONG).show()
                     return@launch
                 }
 
