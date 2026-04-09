@@ -83,11 +83,15 @@ class TransferActivity : AppCompatActivity() {
         lifecycleScope.launch {
             if (fromWarehouseId != -1) {
                 val w = AppDatabase.getInstance(this@TransferActivity).warehouseDao().getById(fromWarehouseId)
-                binding.btnFrom.text = w?.name ?: "Almacen #$fromWarehouseId"
+                binding.btnFrom.text = "DE: ${w?.name ?: "Almacen #$fromWarehouseId"}"
+            } else {
+                binding.btnFrom.text = "ORIGEN: Seleccionar"
             }
             if (toWarehouseId != -1) {
                 val w = AppDatabase.getInstance(this@TransferActivity).warehouseDao().getById(toWarehouseId)
-                binding.btnTo.text = w?.name ?: "Almacen #$toWarehouseId"
+                binding.btnTo.text = "A: ${w?.name ?: "Almacen #$toWarehouseId"}"
+            } else {
+                binding.btnTo.text = "DESTINO: Seleccionar"
             }
         }
     }
@@ -108,10 +112,10 @@ class TransferActivity : AppCompatActivity() {
                 val selected = warehouses[which]
                 if (isOrigin) {
                     fromWarehouseId = selected.id
-                    binding.btnFrom.text = selected.name
+                    binding.btnFrom.text = "DE: ${selected.name}"
                 } else {
                     toWarehouseId = selected.id
-                    binding.btnTo.text = selected.name
+                    binding.btnTo.text = "A: ${selected.name}"
                 }
                 dialog.dismiss()
                 updatePrompt()
