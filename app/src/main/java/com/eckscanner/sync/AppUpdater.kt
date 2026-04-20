@@ -31,11 +31,6 @@ object AppUpdater {
             val installedVersion = getInstalledVersionTag(context)
             if (tagName == installedVersion) return@withContext null
 
-            // Check if user skipped this version
-            val skipped = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .getString(KEY_SKIPPED_VERSION, null)
-            if (tagName == skipped) return@withContext null
-
             // Find APK asset
             val assets = json.getJSONArray("assets")
             for (i in 0 until assets.length()) {

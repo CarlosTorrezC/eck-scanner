@@ -250,12 +250,10 @@ class HomeActivity : AppCompatActivity() {
             val update = AppUpdater.checkForUpdate(this@HomeActivity) ?: return@launch
             pendingUpdate = update
             AlertDialog.Builder(this@HomeActivity)
-                .setTitle("Actualizacion disponible")
-                .setMessage(update.releaseName)
-                .setPositiveButton("Descargar") { _, _ -> startDownload(update) }
-                .setNegativeButton("Despues") { _, _ ->
-                    AppUpdater.skipVersion(this@HomeActivity, update.tagName)
-                }
+                .setTitle("Actualizacion obligatoria")
+                .setMessage("Debes actualizar a ${update.releaseName} para continuar usando la app.")
+                .setCancelable(false)
+                .setPositiveButton("Descargar ahora") { _, _ -> startDownload(update) }
                 .show()
         }
     }
