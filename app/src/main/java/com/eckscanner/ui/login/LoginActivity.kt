@@ -19,8 +19,10 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // If already configured, go to home
+        val sessionExpired = intent.getBooleanExtra("session_expired", false)
+
         val config = ApiClient.getConfig(this)
-        if (config != null) {
+        if (config != null && !sessionExpired) {
             ApiClient.initialize(config.first, config.second)
             startHome()
             return
@@ -28,6 +30,10 @@ class LoginActivity : AppCompatActivity() {
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (sessionExpired) {
+            android.widget.Toast.makeText(this, "Sesion expirada. Vuelve a conectar.", android.widget.Toast.LENGTH_LONG).show()
+        }
 
         binding.btnConnect.setOnClickListener { connect() }
     }

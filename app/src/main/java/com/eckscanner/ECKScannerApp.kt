@@ -19,6 +19,18 @@ class ECKScannerApp : Application() {
         if (config != null && !ApiClient.isInitialized()) {
             ApiClient.initialize(config.first, config.second)
         }
+
+        // Handle token expiration - redirect to login
+        ApiClient.onUnauthorized = {
+            android.os.Handler(mainLooper).post {
+                ApiClient.clearConfig(this)
+                val intent = android.content.Intent(this, com.eckscanner.ui.login.LoginActivity::class.java)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                intent.putExtra("session_expired", true)
+                startActivity(intent)
+            }
+        }
     }
 
     companion object {

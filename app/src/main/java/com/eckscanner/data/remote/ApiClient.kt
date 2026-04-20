@@ -13,13 +13,20 @@ object ApiClient {
     private var retrofit: Retrofit? = null
     private var apiService: ApiService? = null
 
+    /** Called when a 401 Unauthorized is received - token expired */
+    var onUnauthorized: (() -> Unit)? = null
+
     fun initialize(baseUrl: String, token: String) {
         val authInterceptor = Interceptor { chain ->
             val request = chain.request().newBuilder()
                 .addHeader("Authorization", "Bearer $token")
                 .addHeader("Accept", "application/json")
                 .build()
-            chain.proceed(request)
+            val response = chain.proceed(request)
+            if (response.code == 401) {
+                onUnauthorized?.invoke()
+            }
+            response
         }
 
         val logging = HttpLoggingInterceptor().apply {
