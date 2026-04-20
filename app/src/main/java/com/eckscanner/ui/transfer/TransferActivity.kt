@@ -170,6 +170,7 @@ class TransferActivity : AppCompatActivity() {
 
             if (existing != null) {
                 existing.quantity += 1.0
+                existing.maxStock = available
                 val index = scanItems.indexOf(existing)
                 adapter.notifyItemChanged(index)
             } else {
