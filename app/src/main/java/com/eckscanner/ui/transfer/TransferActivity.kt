@@ -248,18 +248,22 @@ class TransferActivity : AppCompatActivity() {
                 // Step 2: Send (Pendiente → En Transito)
                 val sendResponse = ApiClient.getService().sendTransfer(transferId)
                 if (!sendResponse.isSuccessful) {
+                    // Rollback: cancel the pending transfer
+                    try { ApiClient.getService().cancelTransfer(transferId) } catch (_: Exception) {}
                     val err = sendResponse.errorBody()?.string()?.take(100) ?: ""
                     ScanFeedback.error(this@TransferActivity)
-                    Toast.makeText(this@TransferActivity, "Creada pero error al enviar: $err", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@TransferActivity, "Error al enviar (cancelada): $err", Toast.LENGTH_LONG).show()
                     return@launch
                 }
 
                 // Step 3: Receive all (En Transito → Completada)
                 val receiveResponse = ApiClient.getService().receiveTransfer(transferId, ReceiveTransferRequest(items = null))
                 if (!receiveResponse.isSuccessful) {
+                    // Rollback: cancel the in-transit transfer (returns stock to origin)
+                    try { ApiClient.getService().cancelTransfer(transferId) } catch (_: Exception) {}
                     val err = receiveResponse.errorBody()?.string()?.take(100) ?: ""
                     ScanFeedback.error(this@TransferActivity)
-                    Toast.makeText(this@TransferActivity, "Enviada pero error al recibir: $err", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@TransferActivity, "Error al recibir (cancelada): $err", Toast.LENGTH_LONG).show()
                     return@launch
                 }
 
